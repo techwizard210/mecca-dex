@@ -62,3 +62,37 @@
 .css-g53se3 {
   color: rgb(255 255 255 / 1);
 }
+
+.MuiSlider-markLabel {
+  color: #8293a1 !important;
+}
+
+/* .chart-container {
+  flex: 1;
+} */
+
+.tv-lightweight-charts {
+  flex: 1;
+  height: 100%;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #10181E;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #02080c;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #061722;
+}
