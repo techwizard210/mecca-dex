@@ -15,12 +15,7 @@ import eth from "../assets/images/eth.png";
 import History from "../components/History";
 import Chart from "../components/Chart";
 
-const organizeNumber = (param) => {
-  return parseFloat(param).toLocaleString(undefined, {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  });
-};
+import { organizeNumber } from "../utils/DataProvider";
 
 function Perps() {
   const [tradeType, setTradeType] = useState("long");
@@ -73,15 +68,44 @@ function Perps() {
 
   return (
     <>
-      <div className="hidden lg:flex lg:flex-1 min-h-full">
-        <div className="w-[calc(100vw-360px)] flex flex-col">
+      <div className="hidden lg:flex lg:flex-1 min-h-full gap-3">
+        <div className="w-[calc(100vw-360px)] flex flex-col border-t border-b border-[#242424]">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between lg:h-[64px] w-full border-b border-[#242424] px-[20px]">
+            <div className="p-1 lg:p-1 lg:pr-4 rounded-lg flex items-center">
+              <img src={eth} alt="eth icon" className="w-[40px]" />
+              <div className="font-semibold text-xs lg:text-base text-white">
+                ETH-PERP
+              </div>
+            </div>
+            <div className="flex gap-7 items-center">
+              <div className="text-white">${organizeNumber(3471.20)}</div>
+              <div className="flex gap-3 xl:gap-7">
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">24h change</p>
+                  <div className="text-xs text-white">2.42%</div>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">24h Vol</p>
+                  <div className="text-xs text-white">23.16M</div>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">24h High</p>
+                  <div className="text-xs text-white">${organizeNumber(3512.22)}</div>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">24h Low</p>
+                  <div className="text-xs text-white">${organizeNumber(3389.31)}</div>
+                </div>
+              </div>
+            </div>
+          </div>
           <Chart />
           <History />
         </div>
-        <div className="w-[360px] bg-[#1c2936] flex flex-col text-white text-[25px]">
-          <div className="bg-[#304256] px-4 py-5 flex flex-col gap-4">
+        <div className="w-[360px] bg-[#131313] flex flex-col text-white text-[25px]">
+          <div className="bg-[#1b1b1b] px-4 py-5 flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center rounded-full bg-[#19232D]">
+              <div className="flex items-center rounded-full bg-[#272626]">
                 <button
                   type="button"
                   className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "long" ? "long-trade" : ""
@@ -118,10 +142,10 @@ function Perps() {
               <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
                 You're paying
               </div>
-              <div className="bg-[#19232D] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
+              <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                 <div className="flex flex-col dark:text-white h-full justify-center">
                   <div className="flex justify-between">
-                    <div className="p-1 lg:p-1 lg:pr-4 rounded-lg flex items-center bg-[#304256]">
+                    <div className="p-1 lg:p-1 lg:pr-4 rounded-lg flex items-center bg-[#1b1b1b]">
                       <img src={eth} alt="eth icon" className="w-[40px]" />
                       <div className="font-semibold text-xs lg:text-base">
                         ETH
@@ -130,7 +154,7 @@ function Perps() {
                     <div className="text-right">
                       <input
                         placeholder="0.00"
-                        className="bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[200px]"
+                        className="bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[180px]"
                         type="text"
                       />
                     </div>
@@ -142,10 +166,10 @@ function Perps() {
               <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
                 Size of {tradeType === "long" ? "Long" : "Short"}
               </div>
-              <div className="bg-[#19232D] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
+              <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                 <div className="flex flex-col dark:text-white h-full justify-center">
-                  <div className="flex items-center">
-                    <div className="p-1 pr-2 lg:p-1 lg:pr-4 rounded-lg flex items-center bg-[#304256]">
+                  <div className="flex items-center justify-between">
+                    <div className="p-1 pr-2 lg:p-1 lg:pr-4 rounded-lg flex items-center bg-[#1b1b1b]">
                       <img src={eth} alt="eth icon" className="w-[40px]" />
                       <div className="font-semibold text-xs lg:text-base">
                         ETH
@@ -156,7 +180,7 @@ function Perps() {
                         inputMode="decimal"
                         data-lpignore="true"
                         placeholder="0.00"
-                        className="h-full bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[200px]"
+                        className="h-full bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[180px]"
                         type="text"
                       />
                     </div>
@@ -168,7 +192,7 @@ function Perps() {
               <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
                 Leverage
               </div>
-              <div className="bg-[#19232D] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
+              <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                 <div className="flex dark:text-white h-full">
                   <IconButton
                     aria-label="add an alarm"
@@ -249,9 +273,10 @@ function Perps() {
               </div>
             </div>
             <div className="w-full !bg-transparent css-g53se3">
-              <button className="h-full rounded-xl text-white group bg-none bg-[#141519] hover:bg-gradient-to-r from-[rgba(199,242,132,1))] to-[rgba(0,190,240,1)] border border-transparent hover:border hover:border-[#c7f284] w-full transition-all duration-200">
-                <div className="rounded-xl bg-v2-text-gradient bg-clip-text text-transparent group-disabled:bg-none group-disabled:text-opacity-25 group-disabled:text-[#CFF3FF] py-5 text-lg font-medium leading-none">
-                  <span>Connect Wallet</span>
+              <button className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200">
+                <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
+                  {/* <span className="text-[#e69f00]">Connect Wallet</span> */}
+                  <span className="text-[#e69f00]">Start Trade</span>
                 </div>
               </button>
             </div>
@@ -298,11 +323,40 @@ function Perps() {
       </div>
       <div className="flex lg:hidden min-h-full w-100">
         <div className="flex flex-col w-full">
+          {/* <div className="flex flex-col lg:flex-row lg:items-center justify-between lg:h-[64px] w-full border-b border-[#242424] px-[20px]">
+            <div className="p-1 lg:p-1 lg:pr-4 rounded-lg flex items-center">
+              <img src={eth} alt="eth icon" className="w-[40px]" />
+              <div className="font-semibold text-xs lg:text-base text-white">
+                ETH-PERP
+              </div>
+            </div>
+            <div className="flex gap-7 items-center">
+              <div className="text-white">${organizeNumber(3471.20)}</div>
+              <div className="flex gap-3 xl:gap-7">
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">24h change</p>
+                  <div className="text-xs text-white">2.42%</div>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">24h Vol</p>
+                  <div className="text-xs text-white">23.16M</div>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">24h High</p>
+                  <div className="text-xs text-white">${organizeNumber(3512.22)}</div>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">24h Low</p>
+                  <div className="text-xs text-white">${organizeNumber(3389.31)}</div>
+                </div>
+              </div>
+            </div>
+          </div> */}
           <Chart />
-          <div className="bg-[#1c2936] flex flex-col text-white text-[25px]">
-            <div className="bg-[#304256] px-4 py-5 flex flex-col gap-4">
+          <div className="bg-[#131313] flex flex-col text-white text-[25px]">
+            <div className="bg-[#1b1b1b] px-4 py-5 flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center rounded-full bg-[#19232D]">
+                <div className="flex items-center rounded-full bg-[#272626]">
                   <button
                     type="button"
                     className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "long" ? "long-trade" : ""
@@ -344,10 +398,10 @@ function Perps() {
                 <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
                   You're paying
                 </div>
-                <div className="bg-[#19232D] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
+                <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                   <div className="flex flex-col dark:text-white h-full justify-center">
                     <div className="flex justify-between">
-                      <div className="p-1 lg:p-1 lg:pr-4 rounded-lg flex items-center bg-[#304256]">
+                      <div className="px-2 py-1 lg:p-1 lg:pr-4 rounded-lg flex items-center bg-[#1b1b1b]">
                         <img src={eth} alt="eth icon" className="w-[40px]" />
                         <div className="font-semibold text-xs lg:text-base">
                           ETH
@@ -356,7 +410,7 @@ function Perps() {
                       <div className="text-right">
                         <input
                           placeholder="0.00"
-                          className="bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[200px]"
+                          className="bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[200px] pr-2"
                           type="text"
                         />
                       </div>
@@ -368,21 +422,19 @@ function Perps() {
                 <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
                   Size of {tradeType === "long" ? "Long" : "Short"}
                 </div>
-                <div className="bg-[#19232D] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
+                <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                   <div className="flex flex-col dark:text-white h-full justify-center">
-                    <div className="flex items-center">
-                      <div className="p-1 pr-2 lg:p-1 lg:pr-4 rounded-lg flex items-center bg-[#304256]">
+                    <div className="flex items-center justify-between">
+                      <div className="px-2 py-1 lg:p-1 lg:pr-4 rounded-lg flex items-center bg-[#1b1b1b]">
                         <img src={eth} alt="eth icon" className="w-[40px]" />
                         <div className="font-semibold text-xs lg:text-base">
                           ETH
                         </div>
                       </div>
-                      <div className="">
+                      <div className="text-right">
                         <input
-                          inputMode="decimal"
-                          data-lpignore="true"
                           placeholder="0.00"
-                          className="h-full bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[200px]"
+                          className="bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[200px] pr-2"
                           type="text"
                         />
                       </div>
@@ -394,7 +446,7 @@ function Perps() {
                 <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
                   Leverage
                 </div>
-                <div className="bg-[#19232D] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
+                <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                   <div className="flex dark:text-white h-full">
                     <IconButton
                       aria-label="add an alarm"
@@ -405,7 +457,7 @@ function Perps() {
                     <input
                       inputMode="decimal"
                       placeholder="0.00"
-                      className="bg-transparent disabled:opacity-100 disabled:text-black dark:text-white text-right dark:placeholder:text-white/25 outline-none font-semibold text-white text-xs lg:text-sm !text-center w-full h-full"
+                      className="bg-transparent disabled:opacity-100 disabled:text-black dark:text-white text-center dark:placeholder:text-white/25 outline-none font-semibold text-white text-xs lg:text-sm w-full h-full"
                       type="text"
                       value={`${leverage}x`}
                       onChange={(event) => {
@@ -422,18 +474,17 @@ function Perps() {
                 </div>
               </div>
               <div className="flex justify-center">
-                <Box sx={{ width: 300 }}>
+                <Box sx={{ width: '100%',padding: '15px' }}>
                   <Slider
                     aria-label="Restricted values"
                     defaultValue={1.1}
-                    // getAriaValueText={valuetext}
                     step={0.1}
                     valueLabelDisplay="auto"
                     marks={marks}
                     max={5.0}
                     min={1.1}
                     sx={{
-                      color: "#32df7b",
+                      color: tradeType === "long" ? "#32df7b" : "#eb5757",
                     }}
                   />
                 </Box>
@@ -474,9 +525,9 @@ function Perps() {
                 </div>
               </div>
               <div className="w-full !bg-transparent css-g53se3">
-                <button className="h-full rounded-xl text-white group bg-none bg-[#141519] hover:bg-gradient-to-r from-[rgba(199,242,132,1))] to-[rgba(0,190,240,1)] border border-transparent hover:border hover:border-[#c7f284] w-full transition-all duration-200">
-                  <div className="rounded-xl bg-v2-text-gradient bg-clip-text text-transparent group-disabled:bg-none group-disabled:text-opacity-25 group-disabled:text-[#CFF3FF] py-5 text-lg font-medium leading-none">
-                    <span>Connect Wallet</span>
+                <button className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200">
+                  <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
+                    <span className="text-[#e69f00]">Connect Wallet</span>
                   </div>
                 </button>
               </div>
