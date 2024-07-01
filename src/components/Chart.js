@@ -162,6 +162,7 @@ function Chart() {
     ];
 
     useEffect(() => {
+        let candleSeries;
         async function fetchData() {
             const priceData = await fetchOHLCData();
             chart.current = await createChart(chartContainerRef.current, {
@@ -190,7 +191,7 @@ function Chart() {
                 },
             });
 
-            const candleSeries = await chart.current.addCandlestickSeries({
+            candleSeries = await chart.current.addCandlestickSeries({
                 upColor: "#4bffb5",
                 downColor: "#ff4976",
                 borderDownColor: "#ff4976",
@@ -211,17 +212,20 @@ function Chart() {
                 }, 0);
             });
 
-            setInterval(() => {
-                console.log('interval');
-                // const priceData = fetchOHLCData();
-                // candleSeries.update(priceData);
-            }, 1000);
-
             await resizeObserver.current.observe(chartContainerRef.current);
 
             return () => resizeObserver.current.disconnect();
         }
+
         fetchData();
+
+        // const intervalValid = setInterval(async () => {
+        //     const priceData = await fetchOHLCData();
+        //     await candleSeries.setData(priceData);
+        //     console.log('change');
+        // }, 1000);
+
+        // return () => clearInterval(intervalValid);
     }, []);
 
     return (
