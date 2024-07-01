@@ -219,12 +219,13 @@ function Chart() {
 
         fetchData();
 
-        const intervalValid = setInterval(async () => {
-            const priceData = await fetchOHLCData();
-            await candleSeries.setData(priceData);
-        }, 10000);
+        // const intervalValid = setInterval(async () => {
+        //     const priceData = await fetchOHLCData();
+        //     await candleSeries.setData(priceData);
+        //     console.log('change');
+        // }, 1000);
 
-        return () => clearInterval(intervalValid);
+        // return () => clearInterval(intervalValid);
     }, []);
 
     return (
