@@ -24,7 +24,7 @@ const organizeNumber = (param) => {
 
 function Perps() {
   const [tradeType, setTradeType] = useState("long");
-  const [leverage, setLeverage] = useState(1.2);
+  const [leverage, setLeverage] = useState(2);
   const [collateral, setCollateral] = useState(organizeNumber(1348.23));
   const [size, setSize] = useState(organizeNumber(17809.59));
 
@@ -34,7 +34,7 @@ function Perps() {
 
   const changeLeverage = (step) => {
     if (step === -0.1) {
-      if (leverage <= 1.1) return;
+      if (leverage <= 2) return;
       else setLeverage((prev) => ((prev * 10 + step * 10) / 10).toFixed(1));
     }
 
@@ -45,10 +45,6 @@ function Perps() {
   };
 
   const marks = [
-    {
-      value: 1.1,
-      label: "1.1x",
-    },
     {
       value: 2,
       label: "2x",
@@ -67,6 +63,14 @@ function Perps() {
     },
   ];
 
+  useEffect(() => {
+    const ws = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data.p);
+    };
+  }, []);
+
   return (
     <>
       <div className="hidden lg:flex lg:flex-1 min-h-full">
@@ -80,9 +84,8 @@ function Perps() {
               <div className="flex items-center rounded-full bg-[#19232D]">
                 <button
                   type="button"
-                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
-                    tradeType === "long" ? "long-trade" : ""
-                  }`}
+                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "long" ? "long-trade" : ""
+                    }`}
                   onClick={() => handleTrade("long")}
                 >
                   <span className="text-xs lg:text-sm leading-none">Long</span>
@@ -92,9 +95,8 @@ function Perps() {
                 </button>
                 <button
                   type="button"
-                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
-                    tradeType === "short" ? "short-trade" : ""
-                  }`}
+                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "short" ? "short-trade" : ""
+                    }`}
                   onClick={() => handleTrade("short")}
                 >
                   <span className="text-xs lg:text-sm leading-none">Short</span>
@@ -197,14 +199,16 @@ function Perps() {
               <Box sx={{ width: 300 }}>
                 <Slider
                   aria-label="Restricted values"
-                  defaultValue={1.1}
+                  defaultValue={2}
+                  value={leverage}
+                  onChange={(e) => (setLeverage(e.target.value))}
                   step={0.1}
                   valueLabelDisplay="auto"
                   marks={marks}
                   max={5.0}
-                  min={1.1}
+                  min={2}
                   sx={{
-                    color: "#32df7b",
+                    color: tradeType === "long" ? "#32df7b" : "#eb5757",
                   }}
                 />
               </Box>
@@ -301,9 +305,8 @@ function Perps() {
                 <div className="flex items-center rounded-full bg-[#19232D]">
                   <button
                     type="button"
-                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
-                      tradeType === "long" ? "long-trade" : ""
-                    }`}
+                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "long" ? "long-trade" : ""
+                      }`}
                     onClick={() => handleTrade("long")}
                   >
                     <span className="text-xs lg:text-sm leading-none">
@@ -315,18 +318,16 @@ function Perps() {
                   </button>
                   <button
                     type="button"
-                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
-                      tradeType === "short" ? "short-trade" : ""
-                    }`}
+                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "short" ? "short-trade" : ""
+                      }`}
                     onClick={() => handleTrade("short")}
                   >
                     <span className="text-xs lg:text-sm leading-none">
                       Short
                     </span>
                     <TrendingDownIcon
-                      className={`${
-                        tradeType === "short" ? "short-trade" : ""
-                      }`}
+                      className={`${tradeType === "short" ? "short-trade" : ""
+                        }`}
                     />
                   </button>
                 </div>

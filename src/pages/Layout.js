@@ -5,8 +5,8 @@ import logo from "../assets/images/logo.png";
 
 function Layout() {
   return (
-    <div className="bg-[#192531] min-h-screen flex flex-col">
-      <div className="flex justify-between bg-[#121b23] text-[#b3c2c8] px-5 items-center h-[60px]">
+    <div className="bg-[#131313] min-h-screen flex flex-col">
+      <div className="flex justify-between bg-[#131313] text-[#b3c2c8] px-5 items-center h-[60px]">
         <Link to="/" className="no-underline text-lg">
           <img alt="logo" src={logo} className="h-[50px]" />
         </Link>
