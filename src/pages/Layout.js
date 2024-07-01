@@ -18,8 +18,10 @@ function Layout() {
             Perps
           </button>
         </div>
-        <button className="box-border px-[15px] py-[5px] bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text border-solid border-[1.5px] hover:border-[#c7e574] border-transparent rounded-full transition-all duration-200 font-bold">
-          Connect Wallet
+        <button className="rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-content transition-all duration-200">
+          <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-2 px-5 text-lg font-medium leading-none">
+            <span className="text-[#e69f00] text-[16px]">Connect Wallet</span>
+          </div>
         </button>
       </div>
       <Outlet />
