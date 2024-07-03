@@ -7,6 +7,7 @@ function Chart() {
     const chartContainerRef = useRef();
     const chart = useRef();
     const resizeObserver = useRef();
+    const effectFlag = useRef(false);
 
     const volumeData = [
         { time: "2018-10-19", value: 19103293.0 },
@@ -162,70 +163,64 @@ function Chart() {
     ];
 
     useEffect(() => {
-        let candleSeries;
-        async function fetchData() {
-            const priceData = await fetchOHLCData();
-            chart.current = await createChart(chartContainerRef.current, {
-                width: chartContainerRef.current.clientWidth,
-                height: 500,
-                layout: {
-                    background: { type: "solid", color: "#253248" },
-                    textColor: "rgba(255, 255, 255, 0.9)",
-                },
-                grid: {
-                    vertLines: {
-                        color: "#334158",
+        if (effectFlag.current) {
+            let candleSeries;
+            async function fetchData() {
+                const priceData = await fetchOHLCData();
+                chart.current = await createChart(chartContainerRef.current, {
+                    width: chartContainerRef.current.clientWidth,
+                    height: 500,
+                    layout: {
+                        background: { type: "solid", color: "#253248" },
+                        textColor: "rgba(255, 255, 255, 0.9)",
                     },
-                    horzLines: {
-                        color: "#334158",
+                    grid: {
+                        vertLines: {
+                            color: "#334158",
+                        },
+                        horzLines: {
+                            color: "#334158",
+                        },
                     },
-                },
-                crosshair: {
-                    mode: CrosshairMode.Normal,
-                },
-                priceScale: {
-                    borderColor: "#485c7b",
-                },
-                timeScale: {
-                    borderColor: "#485c7b",
-                },
-            });
+                    crosshair: {
+                        mode: CrosshairMode.Normal,
+                    },
+                    priceScale: {
+                        borderColor: "#485c7b",
+                    },
+                    timeScale: {
+                        borderColor: "#485c7b",
+                    },
+                });
 
-            candleSeries = await chart.current.addCandlestickSeries({
-                upColor: "#4bffb5",
-                downColor: "#ff4976",
-                borderDownColor: "#ff4976",
-                borderUpColor: "#4bffb5",
-                wickDownColor: "#838ca1",
-                wickUpColor: "#838ca1",
-            });
+                candleSeries = await chart.current.addCandlestickSeries({
+                    upColor: "#4bffb5",
+                    downColor: "#ff4976",
+                    borderDownColor: "#ff4976",
+                    borderUpColor: "#4bffb5",
+                    wickDownColor: "#838ca1",
+                    wickUpColor: "#838ca1",
+                });
 
-            await candleSeries.setData(priceData);
+                await candleSeries.setData(priceData);
 
-            await chart.current.timeScale().fitContent();
+                await chart.current.timeScale().fitContent();
 
-            resizeObserver.current = await new ResizeObserver((entries) => {
-                const { width, height } = entries[0].contentRect;
-                chart.current.applyOptions({ width, height });
-                setTimeout(() => {
-                    chart.current.timeScale().fitContent();
-                }, 0);
-            });
+                // resizeObserver.current = await new ResizeObserver((entries) => {
+                //     const { width, height } = entries[0].contentRect;
+                //     chart.current.applyOptions({ width, height });
+                //     setTimeout(() => {
+                //         chart.current.timeScale().fitContent();
+                //     }, 0);
+                // });
 
-            await resizeObserver.current.observe(chartContainerRef.current);
+                // await resizeObserver.current.observe(chartContainerRef.current);
 
-            return () => resizeObserver.current.disconnect();
+                // return () => resizeObserver.current.disconnect();
+            }
+            fetchData();
         }
-
-        fetchData();
-
-        // const intervalValid = setInterval(async () => {
-        //     const priceData = await fetchOHLCData();
-        //     await candleSeries.setData(priceData);
-        //     console.log('change');
-        // }, 1000);
-
-        // return () => clearInterval(intervalValid);
+        effectFlag.current = true;
     }, []);
 
     return (

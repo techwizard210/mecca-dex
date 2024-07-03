@@ -1,8 +1,20 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
+import { getTradeHistory } from "../api/api";
 
 function History() {
   const [category, setCategory] = useState(1);
+  const [tradeHistory, setTradeHistory] = useState([]);
+
+  useEffect(() => {
+    async function getHistory() {
+      const history = await getTradeHistory();
+      setTradeHistory(history);
+    }
+
+    getHistory();
+  }, []);
+
   return (
     <>
       <div className="flex w-full lg:mx-auto bg-[#131313] relative">
@@ -37,18 +49,23 @@ function History() {
         </div>
       </div>
       <div className="flex-1 w-full min-w-[300px] overflow-hidden bg-[#131313] pb-20">
-        <div className="w-full text-xs xl:px-0 overflow-x-auto webkit-scrollbar">
-          <div className="flex flex-col items-center space-y-4 rounded-lg mt-4 bg-white-5 py-[60px] justify-start dark:border-white-10 mx-5 lg:mx-0">
-            <div className="text-sm dark:text-white/50">
-              Connect your wallet to see your Trades
-            </div>
-            <button className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-content transition-all duration-200">
-              <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-3 px-8 text-lg font-medium leading-none">
-                <span className="text-[#e69f00]">Connect Wallet</span>
+        {
+          tradeHistory ? <div className="text-white">
+            {tradeHistory}
+          </div> : <div className="w-full text-xs xl:px-0 overflow-x-auto webkit-scrollbar">
+            <div className="flex flex-col items-center space-y-4 rounded-lg mt-4 bg-white-5 py-[60px] justify-start dark:border-white-10 mx-5 lg:mx-0">
+              <div className="text-sm dark:text-white/50 text-white/50">
+                Connect your wallet to see your Trades
               </div>
-            </button>
+              <button className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-content transition-all duration-200">
+                <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-3 px-8 text-lg font-medium leading-none">
+                  <span className="text-[#e69f00]">Connect Wallet</span>
+                </div>
+              </button>
+            </div>
           </div>
-        </div>
+        }
+
       </div>
     </>
   );

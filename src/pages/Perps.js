@@ -15,13 +15,15 @@ import eth from "../assets/images/eth.png";
 import History from "../components/History";
 import Chart from "../components/Chart";
 
-import { organizeNumber } from "../utils/DataProvider";
+import { organizeNumber, fetchETHPrice } from "../utils/DataProvider";
+import { postTrade } from "../api/api";
 
 function Perps() {
   const [tradeType, setTradeType] = useState("long");
   const [leverage, setLeverage] = useState(2);
   const [collateral, setCollateral] = useState(organizeNumber(1348.23));
   const [size, setSize] = useState(organizeNumber(17809.59));
+  const [entryPrice, setEntryPrice] = useState(3300);
 
   const handleTrade = (type) => {
     setTradeType(type);
@@ -37,6 +39,10 @@ function Perps() {
       if (leverage >= 4.9) return;
       else setLeverage((prev) => ((prev * 10 + step * 10) / 10).toFixed(1));
     }
+  };
+
+  const submitTrade = () => {
+    postTrade(entryPrice, leverage, tradeType);
   };
 
   const marks = [
@@ -59,11 +65,23 @@ function Perps() {
   ];
 
   useEffect(() => {
-    const ws = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log(data.p);
-    };
+    // const ws = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
+    // ws.onmessage = (event) => {
+    //   const data = JSON.parse(event.data);
+    //   console.log(data.p);
+    // };
+    async function getETHPrice() {
+      const price = await fetchETHPrice();
+      setEntryPrice(price);
+    }
+
+    getETHPrice();
+
+    const priceInterval = setInterval(() => {
+      getETHPrice();
+    }, 15000);
+
+    return () => clearInterval(priceInterval);
   }, []);
 
   return (
@@ -78,23 +96,35 @@ function Perps() {
               </div>
             </div>
             <div className="flex gap-7 items-center">
-              <div className="text-white">${organizeNumber(3471.20)}</div>
+              <div className="text-white">${organizeNumber(entryPrice)}</div>
               <div className="flex gap-3 xl:gap-7">
                 <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">24h change</p>
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h change
+                  </p>
                   <div className="text-xs text-white">2.42%</div>
                 </div>
                 <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">24h Vol</p>
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h Vol
+                  </p>
                   <div className="text-xs text-white">23.16M</div>
                 </div>
                 <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">24h High</p>
-                  <div className="text-xs text-white">${organizeNumber(3512.22)}</div>
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h High
+                  </p>
+                  <div className="text-xs text-white">
+                    ${organizeNumber(3512.22)}
+                  </div>
                 </div>
                 <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">24h Low</p>
-                  <div className="text-xs text-white">${organizeNumber(3389.31)}</div>
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h Low
+                  </p>
+                  <div className="text-xs text-white">
+                    ${organizeNumber(3389.31)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -108,8 +138,9 @@ function Perps() {
               <div className="flex items-center rounded-full bg-[#272626]">
                 <button
                   type="button"
-                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "long" ? "long-trade" : ""
-                    }`}
+                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
+                    tradeType === "long" ? "long-trade" : ""
+                  }`}
                   onClick={() => handleTrade("long")}
                 >
                   <span className="text-xs lg:text-sm leading-none">Long</span>
@@ -119,8 +150,9 @@ function Perps() {
                 </button>
                 <button
                   type="button"
-                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "short" ? "short-trade" : ""
-                    }`}
+                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
+                    tradeType === "short" ? "short-trade" : ""
+                  }`}
                   onClick={() => handleTrade("short")}
                 >
                   <span className="text-xs lg:text-sm leading-none">Short</span>
@@ -225,7 +257,7 @@ function Perps() {
                   aria-label="Restricted values"
                   defaultValue={2}
                   value={leverage}
-                  onChange={(e) => (setLeverage(e.target.value))}
+                  onChange={(e) => setLeverage(e.target.value)}
                   step={0.1}
                   valueLabelDisplay="auto"
                   marks={marks}
@@ -273,7 +305,10 @@ function Perps() {
               </div>
             </div>
             <div className="w-full !bg-transparent css-g53se3">
-              <button className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200">
+              <button
+                className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200"
+                onClick={submitTrade}
+              >
                 <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
                   {/* <span className="text-[#e69f00]">Connect Wallet</span> */}
                   <span className="text-[#e69f00]">Start Trade</span>
@@ -286,7 +321,9 @@ function Perps() {
               <div className="space-y-1">
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                   <span className="text-xs text-white/50">Entry price</span>
-                  <span className="text-xs text-white/50">$3200</span>
+                  <span className="text-xs text-white/50">
+                    ${organizeNumber(entryPrice)}
+                  </span>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                   <span className="text-xs text-white/50">
@@ -359,8 +396,9 @@ function Perps() {
                 <div className="flex items-center rounded-full bg-[#272626]">
                   <button
                     type="button"
-                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "long" ? "long-trade" : ""
-                      }`}
+                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
+                      tradeType === "long" ? "long-trade" : ""
+                    }`}
                     onClick={() => handleTrade("long")}
                   >
                     <span className="text-xs lg:text-sm leading-none">
@@ -372,16 +410,18 @@ function Perps() {
                   </button>
                   <button
                     type="button"
-                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "short" ? "short-trade" : ""
-                      }`}
+                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
+                      tradeType === "short" ? "short-trade" : ""
+                    }`}
                     onClick={() => handleTrade("short")}
                   >
                     <span className="text-xs lg:text-sm leading-none">
                       Short
                     </span>
                     <TrendingDownIcon
-                      className={`${tradeType === "short" ? "short-trade" : ""
-                        }`}
+                      className={`${
+                        tradeType === "short" ? "short-trade" : ""
+                      }`}
                     />
                   </button>
                 </div>
@@ -474,7 +514,7 @@ function Perps() {
                 </div>
               </div>
               <div className="flex justify-center">
-                <Box sx={{ width: '100%',padding: '15px' }}>
+                <Box sx={{ width: "100%", padding: "15px" }}>
                   <Slider
                     aria-label="Restricted values"
                     defaultValue={1.1}
@@ -537,7 +577,9 @@ function Perps() {
                 <div className="space-y-1">
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                     <span className="text-xs text-white/50">Entry price</span>
-                    <span className="text-xs text-white/50">$3200</span>
+                    <span className="text-xs text-white/50">
+                      ${organizeNumber(entryPrice)}
+                    </span>
                   </div>
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                     <span className="text-xs text-white/50">
