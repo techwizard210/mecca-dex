@@ -1,15 +1,51 @@
-export function postTrade(entryPrice, leverage, tradeType) {
-    console.log('submit trade api called->', entryPrice, leverage, tradeType);
+import axios from "axios";
+
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
+export async function postTrade(amount, entryPrice, leverage, tradeType) {
+  const param = {
+    amount: amount,
+    entryPrice: entryPrice,
+    leverage: leverage,
+    tradeType: tradeType,
+  };
+  let trades = [];
+  await axios.post(`${SERVER_URL}/startTrade`, param).then(
+    (response) => {
+      trades = response.data.data;
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+  return trades;
 }
 
-export function getTradeHistory(address) {
-    return [
-        [3300, 3500, 3.5, 2021-12-12, 2023-10-11, 'long', 700],  
-        [3300, 3500, 3.5, 2021-12-12, 2023-10-11, 'long', 700]  
-    ]
+export async function getTradeHistory() {
+  let trades = [];
+  await axios.get(`${SERVER_URL}/getTradeHistory`).then(
+    (response) => {
+      trades = response.data.data;
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+  return trades;
 }
 
-export function quitTrade(tradeId) {
-    
+export async function quitTrade(tradeId, entryPrice) {
+  const param = {
+    endPrice: entryPrice,
+    tradeId: tradeId,
+  };
+  let trades = [];
+  await axios.post(`${SERVER_URL}/quitTrade`, param).then(
+    (response) => {
+      trades = response.data.data;
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+  return trades;
 }
-
