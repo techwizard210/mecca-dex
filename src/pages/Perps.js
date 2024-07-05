@@ -17,11 +17,17 @@ import Chart from "../components/Chart";
 
 import { organizeNumber } from "../utils/DataProvider";
 
+import { useDispatch, useSelector } from "react-redux";
+import { postTrade } from "../app/historySlice";
+
 function Perps() {
+  const dispatch = useDispatch();
   const [tradeType, setTradeType] = useState("long");
   const [leverage, setLeverage] = useState(2);
-  const [collateral, setCollateral] = useState(organizeNumber(1348.23));
   const [size, setSize] = useState(organizeNumber(17809.59));
+  const [entryPrice, setEntryPrice] = useState(3312);
+  const [amount, setAmount] = useState(0);
+  const poolBalance = useSelector((state) => state.history.balance);
 
   const handleTrade = (type) => {
     setTradeType(type);
@@ -37,6 +43,16 @@ function Perps() {
       if (leverage >= 4.9) return;
       else setLeverage((prev) => ((prev * 10 + step * 10) / 10).toFixed(1));
     }
+  };
+
+  const submitTrade = () => {
+    const param = {
+      amount,
+      entryPrice,
+      leverage,
+      tradeType,
+    };
+    dispatch(postTrade(param));
   };
 
   const marks = [
@@ -59,11 +75,20 @@ function Perps() {
   ];
 
   useEffect(() => {
-    const ws = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log(data.p);
-    };
+    // const ws = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
+    // ws.onmessage = (event) => {
+    //   const data = JSON.parse(event.data);
+    //   console.log(data.p);
+    // };
+    // async function getETHPrice() {
+    //   const price = await fetchETHPrice();
+    //   setEntryPrice(price);
+    // }
+    // getETHPrice();
+    // const priceInterval = setInterval(() => {
+    //   getETHPrice();
+    // }, 15000);
+    // return () => clearInterval(priceInterval);
   }, []);
 
   return (
@@ -78,29 +103,41 @@ function Perps() {
               </div>
             </div>
             <div className="flex gap-7 items-center">
-              <div className="text-white">${organizeNumber(3471.20)}</div>
+              <div className="text-white">${organizeNumber(entryPrice)}</div>
               <div className="flex gap-3 xl:gap-7">
                 <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">24h change</p>
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h change
+                  </p>
                   <div className="text-xs text-white">2.42%</div>
                 </div>
                 <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">24h Vol</p>
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h Vol
+                  </p>
                   <div className="text-xs text-white">23.16M</div>
                 </div>
                 <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">24h High</p>
-                  <div className="text-xs text-white">${organizeNumber(3512.22)}</div>
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h High
+                  </p>
+                  <div className="text-xs text-white">
+                    ${organizeNumber(3512.22)}
+                  </div>
                 </div>
                 <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">24h Low</p>
-                  <div className="text-xs text-white">${organizeNumber(3389.31)}</div>
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h Low
+                  </p>
+                  <div className="text-xs text-white">
+                    ${organizeNumber(3389.31)}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <Chart />
-          <History />
+          <History ethPrice={entryPrice} />
         </div>
         <div className="w-[360px] bg-[#131313] flex flex-col text-white text-[25px]">
           <div className="bg-[#1b1b1b] px-4 py-5 flex flex-col gap-4">
@@ -108,8 +145,9 @@ function Perps() {
               <div className="flex items-center rounded-full bg-[#272626]">
                 <button
                   type="button"
-                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "long" ? "long-trade" : ""
-                    }`}
+                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
+                    tradeType === "long" ? "long-trade" : ""
+                  }`}
                   onClick={() => handleTrade("long")}
                 >
                   <span className="text-xs lg:text-sm leading-none">Long</span>
@@ -119,8 +157,9 @@ function Perps() {
                 </button>
                 <button
                   type="button"
-                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "short" ? "short-trade" : ""
-                    }`}
+                  className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
+                    tradeType === "short" ? "short-trade" : ""
+                  }`}
                   onClick={() => handleTrade("short")}
                 >
                   <span className="text-xs lg:text-sm leading-none">Short</span>
@@ -156,6 +195,9 @@ function Perps() {
                         placeholder="0.00"
                         className="bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[180px]"
                         type="text"
+                        onChange={(event) => {
+                          setAmount(event.target.value);
+                        }}
                       />
                     </div>
                   </div>
@@ -182,6 +224,8 @@ function Perps() {
                         placeholder="0.00"
                         className="h-full bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[180px]"
                         type="text"
+                        value={amount * leverage}
+                        onChange={() => {}}
                       />
                     </div>
                   </div>
@@ -203,7 +247,7 @@ function Perps() {
                   <input
                     inputMode="decimal"
                     placeholder="0.00"
-                    className="bg-transparent disabled:opacity-100 disabled:text-black dark:text-white text-right dark:placeholder:text-white/25 outline-none font-semibold text-white text-xs lg:text-sm !text-center w-full h-full"
+                    className="bg-transparent disabled:opacity-100 disabled:text-black dark:text-white dark:placeholder:text-white/25 outline-none font-semibold text-white text-xs lg:text-sm text-center w-full h-full"
                     type="text"
                     value={`${leverage}x`}
                     onChange={(event) => {
@@ -225,7 +269,7 @@ function Perps() {
                   aria-label="Restricted values"
                   defaultValue={2}
                   value={leverage}
-                  onChange={(e) => (setLeverage(e.target.value))}
+                  onChange={(e) => setLeverage(e.target.value)}
                   step={0.1}
                   valueLabelDisplay="auto"
                   marks={marks}
@@ -247,7 +291,7 @@ function Perps() {
                         translate="no"
                         className="text-xs text-white/75 mt-0.5"
                       >
-                        <span>{collateral} USD</span>
+                        <span>{entryPrice} USD</span>
                       </div>
                     </div>
                   </div>
@@ -255,7 +299,7 @@ function Perps() {
                 <div className="hidden lg:block">
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                     <span className="text-xs text-white/50 leading-none">
-                      Size in USD
+                      Position Size
                     </span>
                     <div
                       translate="no"
@@ -265,7 +309,7 @@ function Perps() {
                         translate="no"
                         className="text-xs h-[14px] text-white/75"
                       >
-                        <span>{size} USD</span>
+                        <span>{entryPrice * amount * leverage} USD</span>
                       </span>
                     </div>
                   </div>
@@ -273,7 +317,10 @@ function Perps() {
               </div>
             </div>
             <div className="w-full !bg-transparent css-g53se3">
-              <button className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200">
+              <button
+                className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200"
+                onClick={submitTrade}
+              >
                 <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
                   {/* <span className="text-[#e69f00]">Connect Wallet</span> */}
                   <span className="text-[#e69f00]">Start Trade</span>
@@ -286,34 +333,42 @@ function Perps() {
               <div className="space-y-1">
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                   <span className="text-xs text-white/50">Entry price</span>
-                  <span className="text-xs text-white/50">$3200</span>
+                  <span className="text-xs text-white/50">
+                    ${organizeNumber(entryPrice)}
+                  </span>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                   <span className="text-xs text-white/50">
                     Liquidation price
                   </span>
-                  <span className="text-xs text-white/50">-</span>
+                  <span className="text-xs text-white/50">
+                    {organizeNumber(entryPrice / 2)}
+                  </span>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                   <span className="text-xs text-white/50">
-                    Open fee (0.07%)
+                    Execution Fee (0.4%)
                   </span>
-                  <span className="text-xs text-white/50">-</span>
+                  <span className="text-xs text-white/50">
+                    {organizeNumber(
+                      (entryPrice * amount * leverage * 0.004).toFixed(1)
+                    )}
+                  </span>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
-                  <span className="text-xs text-white/50">Impact Fee</span>
-                  <span className="text-xs text-white/50">-</span>
-                </div>
-                <div className="flex flex-col lg:flex-row justify-between lg:items-center">
-                  <span className="text-xs text-white/50">Borrow rate</span>
-                  <span className="text-xs text-white/50">-</span>
+                  <span className="text-xs text-white/50">
+                    Net Position Value
+                  </span>
+                  <span className="text-xs text-white/50">
+                    {organizeNumber(entryPrice * amount * leverage * 0.996)}
+                  </span>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                   <span className="text-xs text-white/50">
                     Available liquidity
                   </span>
                   <span className="text-xs text-white/50">
-                    ${organizeNumber(15000000)}
+                    ${organizeNumber(poolBalance)}
                   </span>
                 </div>
               </div>
@@ -359,8 +414,9 @@ function Perps() {
                 <div className="flex items-center rounded-full bg-[#272626]">
                   <button
                     type="button"
-                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "long" ? "long-trade" : ""
-                      }`}
+                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
+                      tradeType === "long" ? "long-trade" : ""
+                    }`}
                     onClick={() => handleTrade("long")}
                   >
                     <span className="text-xs lg:text-sm leading-none">
@@ -372,16 +428,18 @@ function Perps() {
                   </button>
                   <button
                     type="button"
-                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${tradeType === "short" ? "short-trade" : ""
-                      }`}
+                    className={`w-[70px] h-7 lg:h-auto lg:w-20 flex flex-row items-center justify-center font-semibold space-x-2 text-white/50 fill-current border-2 border-transparent rounded-full px-2 py-1 lg:m-1 bg-perps-green transition-all duration-200 ${
+                      tradeType === "short" ? "short-trade" : ""
+                    }`}
                     onClick={() => handleTrade("short")}
                   >
                     <span className="text-xs lg:text-sm leading-none">
                       Short
                     </span>
                     <TrendingDownIcon
-                      className={`${tradeType === "short" ? "short-trade" : ""
-                        }`}
+                      className={`${
+                        tradeType === "short" ? "short-trade" : ""
+                      }`}
                     />
                   </button>
                 </div>
@@ -412,6 +470,9 @@ function Perps() {
                           placeholder="0.00"
                           className="bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[200px] pr-2"
                           type="text"
+                          onChange={(event) => {
+                            setAmount(event.target.value);
+                          }}
                         />
                       </div>
                     </div>
@@ -436,6 +497,8 @@ function Perps() {
                           placeholder="0.00"
                           className="bg-transparent text-right font-semibold dark:placeholder:text-white/25 outline-none text-lg w-[200px] pr-2"
                           type="text"
+                          value={amount * leverage}
+                          onChange={() => {}}
                         />
                       </div>
                     </div>
@@ -474,19 +537,21 @@ function Perps() {
                 </div>
               </div>
               <div className="flex justify-center">
-                <Box sx={{ width: '100%',padding: '15px' }}>
-                  <Slider
-                    aria-label="Restricted values"
-                    defaultValue={1.1}
-                    step={0.1}
-                    valueLabelDisplay="auto"
-                    marks={marks}
-                    max={5.0}
-                    min={1.1}
-                    sx={{
-                      color: tradeType === "long" ? "#32df7b" : "#eb5757",
-                    }}
-                  />
+                <Box sx={{ width: "100%", padding: "15px" }}>
+                <Slider
+                  aria-label="Restricted values"
+                  defaultValue={2}
+                  value={leverage}
+                  onChange={(e) => setLeverage(e.target.value)}
+                  step={0.1}
+                  valueLabelDisplay="auto"
+                  marks={marks}
+                  max={5.0}
+                  min={2}
+                  sx={{
+                    color: tradeType === "long" ? "#32df7b" : "#eb5757",
+                  }}
+                />
                 </Box>
               </div>
               <div>
@@ -499,7 +564,7 @@ function Perps() {
                           translate="no"
                           className="text-xs text-white/75 mt-0.5"
                         >
-                          <span>{collateral} USD</span>
+                          <span>{entryPrice} USD</span>
                         </div>
                       </div>
                     </div>
@@ -507,7 +572,7 @@ function Perps() {
                   <div className="hidden lg:block">
                     <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                       <span className="text-xs text-white/50 leading-none">
-                        Size in USD
+                        Position Size
                       </span>
                       <div
                         translate="no"
@@ -517,7 +582,7 @@ function Perps() {
                           translate="no"
                           className="text-xs h-[14px] text-white/75"
                         >
-                          <span>{size} USD</span>
+                          <span>{entryPrice * amount * leverage} USD</span>
                         </span>
                       </div>
                     </div>
@@ -525,7 +590,10 @@ function Perps() {
                 </div>
               </div>
               <div className="w-full !bg-transparent css-g53se3">
-                <button className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200">
+                <button
+                  className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200"
+                  onClick={submitTrade}
+                >
                   <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
                     <span className="text-[#e69f00]">Connect Wallet</span>
                   </div>
@@ -537,41 +605,49 @@ function Perps() {
                 <div className="space-y-1">
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                     <span className="text-xs text-white/50">Entry price</span>
-                    <span className="text-xs text-white/50">$3200</span>
+                    <span className="text-xs text-white/50">
+                      ${organizeNumber(entryPrice)}
+                    </span>
                   </div>
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                     <span className="text-xs text-white/50">
                       Liquidation price
                     </span>
-                    <span className="text-xs text-white/50">-</span>
+                    <span className="text-xs text-white/50">
+                      {organizeNumber(entryPrice / 2)}
+                    </span>
                   </div>
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                     <span className="text-xs text-white/50">
-                      Open fee (0.07%)
+                      Execution Fee (0.4%)
                     </span>
-                    <span className="text-xs text-white/50">-</span>
+                    <span className="text-xs text-white/50">
+                      {organizeNumber(
+                        (entryPrice * amount * leverage * 0.004).toFixed(1)
+                      )}
+                    </span>
                   </div>
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">
-                    <span className="text-xs text-white/50">Impact Fee</span>
-                    <span className="text-xs text-white/50">-</span>
-                  </div>
-                  <div className="flex flex-col lg:flex-row justify-between lg:items-center">
-                    <span className="text-xs text-white/50">Borrow rate</span>
-                    <span className="text-xs text-white/50">-</span>
+                    <span className="text-xs text-white/50">
+                      Net Position Value
+                    </span>
+                    <span className="text-xs text-white/50">
+                      {organizeNumber(entryPrice * amount * leverage * 0.996)}
+                    </span>
                   </div>
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">
                     <span className="text-xs text-white/50">
                       Available liquidity
                     </span>
                     <span className="text-xs text-white/50">
-                      ${organizeNumber(15000000)}
+                      ${organizeNumber(poolBalance)}
                     </span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <History />
+          <History ethPrice={entryPrice} />
         </div>
       </div>
     </>
