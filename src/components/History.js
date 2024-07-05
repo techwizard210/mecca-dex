@@ -96,7 +96,9 @@ function History(props) {
           </div>
         ) : (
           tradeHistory
-            .filter((item) => item.profit !== undefined)
+            .filter(
+              (item) => item.profit !== undefined && item.isExpire === undefined
+            )
             .map((history, index) => {
               return (
                 <div
@@ -156,7 +158,7 @@ function History(props) {
           </div>
         ) : (
           tradeHistory
-            .filter((item) => item.profit === undefined)
+            .filter((item) => item.profit !== undefined && item.isExpire === true)
             .map((history, index) => {
               return (
                 <div
