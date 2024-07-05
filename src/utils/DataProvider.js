@@ -1,3 +1,4 @@
+import axios from "axios";
 import moment from "moment-timezone";
 
 const convertDateToSimpleFormat = (dateString) => {
@@ -139,9 +140,15 @@ export const convertUnixTime = (unixtime) => {
 };
 
 export const fetchETHPrice = async () => {
-  const response = await fetch(
-    "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+  const response = await axios.get(
+    "https://api.coingecko.com/api/v3/simple/price",
+    {
+      params: {
+        ids: "ethereum",
+        vs_currencies: "usd",
+      },
+    }
   );
-  const data = await response.json();
-  return data.ethereum.usd;
+  console.log(response.data.ethereum.usd);
+  return response.data.ethereum.usd;
 };

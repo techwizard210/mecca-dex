@@ -41,7 +41,6 @@ export const historySlice = createSlice({
       state.status = "succeeded";
       state.tradeHistory = action.payload.trades;
       state.balance = action.payload.balance;
-      console.log(state.balance);
     });
     builder.addCase(postTrade.fulfilled, (state, action) => {
       state.status = "succeeded";

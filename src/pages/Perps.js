@@ -15,7 +15,7 @@ import eth from "../assets/images/eth.png";
 import History from "../components/History";
 import Chart from "../components/Chart";
 
-import { organizeNumber } from "../utils/DataProvider";
+import { organizeNumber, fetchETHPrice } from "../utils/DataProvider";
 
 import { useDispatch, useSelector } from "react-redux";
 import { postTrade } from "../app/historySlice";
@@ -24,7 +24,6 @@ function Perps() {
   const dispatch = useDispatch();
   const [tradeType, setTradeType] = useState("long");
   const [leverage, setLeverage] = useState(2);
-  const [size, setSize] = useState(organizeNumber(17809.59));
   const [entryPrice, setEntryPrice] = useState(3312);
   const [amount, setAmount] = useState(0);
   const poolBalance = useSelector((state) => state.history.balance);
@@ -73,22 +72,24 @@ function Perps() {
       label: "5x",
     },
   ];
-
+  // const ws = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
+  // ws.onmessage = (event) => {
+  //   const data = JSON.parse(event.data);
+  //   console.log(data.p);
+  // };
   useEffect(() => {
-    // const ws = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
-    // ws.onmessage = (event) => {
-    //   const data = JSON.parse(event.data);
-    //   console.log(data.p);
-    // };
-    // async function getETHPrice() {
-    //   const price = await fetchETHPrice();
-    //   setEntryPrice(price);
-    // }
-    // getETHPrice();
-    // const priceInterval = setInterval(() => {
-    //   getETHPrice();
-    // }, 15000);
-    // return () => clearInterval(priceInterval);
+    const getPrice = async () => {
+      const price = await fetchETHPrice();
+      console.log(price);
+      setEntryPrice(price);
+    };
+
+    getPrice();
+
+    const priceInterval = setInterval(async () => {
+      await getPrice();
+    }, 60000);
+    return () => clearInterval(priceInterval);
   }, []);
 
   return (
@@ -342,7 +343,7 @@ function Perps() {
                     Liquidation price
                   </span>
                   <span className="text-xs text-white/50">
-                    {organizeNumber(entryPrice / 2)}
+                    {organizeNumber((entryPrice * amount * leverage) / 2)}
                   </span>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
@@ -538,20 +539,20 @@ function Perps() {
               </div>
               <div className="flex justify-center">
                 <Box sx={{ width: "100%", padding: "15px" }}>
-                <Slider
-                  aria-label="Restricted values"
-                  defaultValue={2}
-                  value={leverage}
-                  onChange={(e) => setLeverage(e.target.value)}
-                  step={0.1}
-                  valueLabelDisplay="auto"
-                  marks={marks}
-                  max={5.0}
-                  min={2}
-                  sx={{
-                    color: tradeType === "long" ? "#32df7b" : "#eb5757",
-                  }}
-                />
+                  <Slider
+                    aria-label="Restricted values"
+                    defaultValue={2}
+                    value={leverage}
+                    onChange={(e) => setLeverage(e.target.value)}
+                    step={0.1}
+                    valueLabelDisplay="auto"
+                    marks={marks}
+                    max={5.0}
+                    min={2}
+                    sx={{
+                      color: tradeType === "long" ? "#32df7b" : "#eb5757",
+                    }}
+                  />
                 </Box>
               </div>
               <div>
@@ -614,7 +615,7 @@ function Perps() {
                       Liquidation price
                     </span>
                     <span className="text-xs text-white/50">
-                      {organizeNumber(entryPrice / 2)}
+                      {organizeNumber((entryPrice * amount * leverage) / 2)}
                     </span>
                   </div>
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">
