@@ -5,8 +5,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Perps from "./pages/Perps";
 import Dashboard from "./pages/Dashboard";
+import { connectWallet } from "./app/historySlice";
+import { useDispatch } from "react-redux";
 
 function App() {
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    dispatch(connectWallet());
+  }, []);
   return (
     <BrowserRouter>
       <Routes>

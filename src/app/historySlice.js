@@ -1,17 +1,21 @@
 import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import toast from "react-hot-toast";
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 const initialState = {
   tradeHistory: [],
   balance: 0,
+  walletAddress: undefined,
 };
 
 export const getTradeHistory = createAsyncThunk(
   "tradeHistory/getTradeHistory",
-  async () => {
-    const response = await axios.get(`${SERVER_URL}/getTradeHistory`);
+  async (walletAddress) => {
+    const response = await axios.get(
+      `${SERVER_URL}/getTradeHistory/${walletAddress}`
+    );
     return response.data.data;
   }
 );
@@ -32,10 +36,37 @@ export const quitTrade = createAsyncThunk(
   }
 );
 
+export const connectWallet = createAsyncThunk(
+  "tradeHistory/connectWallet",
+  async () => {
+    let account;
+    if (typeof window.ethereum === "undefined") {
+      toast.error("Please install coinbase wallet");
+    } else {
+      const accounts = await window.ethereum.request({
+        method: "eth_accounts",
+      });
+      if (accounts.length > 0) {
+        account = accounts[0];
+      } else {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        account = accounts[0];
+      }
+    }
+    return account;
+  }
+);
+
 export const historySlice = createSlice({
   name: "history",
   initialState,
-  reducers: {},
+  reducers: {
+    disconnectWallet: (state, action) => {
+      state.walletAddress = undefined;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getTradeHistory.fulfilled, (state, action) => {
       state.status = "succeeded";
@@ -56,7 +87,13 @@ export const historySlice = createSlice({
         }
       });
     });
+    builder.addCase(connectWallet.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.walletAddress = action.payload;
+    });
   },
 });
+
+export const { disconnectWallet } = historySlice.actions;
 
 export default historySlice.reducer;

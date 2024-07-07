@@ -5,11 +5,13 @@ import Button from "@mui/material/Button";
 import { useSelector, useDispatch } from "react-redux";
 import { getTradeHistory, quitTrade } from "../app/historySlice";
 import { organizeNumber, convertUnixTime } from "../utils/DataProvider";
+import { connectWallet } from "../app/historySlice";
 
 function History(props) {
   const dispatch = useDispatch();
   const [category, setCategory] = useState(1);
   const tradeHistory = useSelector((state) => state.history.tradeHistory);
+  const walletAddress = useSelector((state) => state.history.walletAddress);
   let tab;
 
   if (category === 1) {
@@ -18,6 +20,7 @@ function History(props) {
         <div className="flex justify-between border-b border-[#242424] py-3">
           <span className="flex-1 text-center">Trade Type</span>
           <span className="flex-1 text-center">Entry Price</span>
+          <span className="flex-1 text-center">Amount</span>
           <span className="flex-1 text-center">Leverage</span>
           <span className="flex-1 text-center">Size</span>
           <span className="flex-1 text-center">Collateral</span>
@@ -45,18 +48,21 @@ function History(props) {
                   <span className="flex-1 text-center">
                     {history.entryPrice}
                   </span>
+                  <span className="flex-1 text-center">{history.amount}</span>
                   <span className="flex-1 text-center">
                     {history.leverage}x
                   </span>
                   <span className="flex-1 text-center">
-                    {history.entryPrice * history.amount * history.leverage}
+                    {organizeNumber(
+                      history.entryPrice * history.amount * history.leverage
+                    )}
                   </span>
                   <span className="flex-1 text-center">
-                    {history.entryPrice * history.amount * history.leverage}
+                    {organizeNumber(history.entryPrice * history.amount * history.leverage)}
                   </span>
                   <span className="flex-1 text-center">
-                    {(history.entryPrice * history.amount * history.leverage) /
-                      2}
+                    {organizeNumber((history.entryPrice * history.amount * history.leverage) /
+                      2)}
                   </span>
                   <span className="flex-1 text-center">
                     {convertUnixTime(history.startDate)}
@@ -124,10 +130,10 @@ function History(props) {
                     {history.leverage}x
                   </span>
                   <span className="flex-1 text-center">
-                    {history.entryPrice * history.amount * history.leverage}
+                    {organizeNumber(history.entryPrice * history.amount * history.leverage)}
                   </span>
                   <span className="flex-1 text-center">
-                    {history.endPrice * history.amount * history.leverage}
+                    {organizeNumber(history.endPrice * history.amount * history.leverage)}
                   </span>
                   <span className="flex-1 text-center">
                     {organizeNumber(history.executionFee)}
@@ -136,11 +142,11 @@ function History(props) {
                     {organizeNumber(history.profit)}
                   </span>
                   <span className="flex-1 text-center">
-                    {history.entryPrice * history.amount * history.leverage}
+                    {organizeNumber(history.entryPrice * history.amount * history.leverage)}
                   </span>
                   <span className="flex-1 text-center">
-                    {(history.entryPrice * history.amount * history.leverage) /
-                      2}
+                    {organizeNumber((history.entryPrice * history.amount * history.leverage) /
+                      2)}
                   </span>
                   <span className="flex-1 text-center">
                     {convertUnixTime(history.startDate)}
@@ -201,10 +207,14 @@ function History(props) {
                     {history.leverage}x
                   </span>
                   <span className="flex-1 text-center">
-                    {history.entryPrice * history.amount * history.leverage}
+                    {organizeNumber(
+                      history.entryPrice * history.amount * history.leverage
+                    )}
                   </span>
                   <span className="flex-1 text-center">
-                    {history.endPrice * history.amount * history.leverage}
+                    {organizeNumber(
+                      history.endPrice * history.amount * history.leverage
+                    )}
                   </span>
                   <span className="flex-1 text-center">
                     {organizeNumber(history.executionFee)}
@@ -213,11 +223,15 @@ function History(props) {
                     {organizeNumber(history.profit)}
                   </span>
                   <span className="flex-1 text-center">
-                    {history.entryPrice * history.amount * history.leverage}
+                    {organizeNumber(
+                      history.entryPrice * history.amount * history.leverage
+                    )}
                   </span>
                   <span className="flex-1 text-center">
-                    {(history.entryPrice * history.amount * history.leverage) /
-                      2}
+                    {organizeNumber(
+                      (history.entryPrice * history.amount * history.leverage) /
+                        2
+                    )}
                   </span>
                   <span className="flex-1 text-center">
                     {convertUnixTime(history.startDate)}
@@ -233,13 +247,18 @@ function History(props) {
     );
   }
 
-  let connectWallet = (
+  let walletSection = (
     <div className="w-full text-xs xl:px-0 overflow-x-auto webkit-scrollbar">
       <div className="flex flex-col items-center space-y-4 rounded-lg mt-4 bg-white-5 py-[60px] justify-start dark:border-white-10 mx-5 lg:mx-0">
         <div className="text-sm dark:text-white/50 text-white/50">
           Connect your wallet to see your Trades
         </div>
-        <button className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-content transition-all duration-200">
+        <button
+          className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-content transition-all duration-200"
+          onClick={() => {
+            dispatch(connectWallet());
+          }}
+        >
           <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-3 px-8 text-lg font-medium leading-none">
             <span className="text-[#e69f00]">Connect Wallet</span>
           </div>
@@ -249,13 +268,16 @@ function History(props) {
   );
 
   useEffect(() => {
-    dispatch(getTradeHistory());
-  }, []);
+    if (walletAddress !== undefined) {
+      dispatch(getTradeHistory(walletAddress));
+    }
+  }, [walletAddress]);
 
   function exitTrade(tradeId) {
     const param = {
       tradeId: tradeId,
       endPrice: props.ethPrice,
+      walletAddress,
     };
     dispatch(quitTrade(param));
   }
@@ -297,7 +319,7 @@ function History(props) {
         </div>
       </div>
       <div className="flex-1 w-full min-w-[300px] overflow-x-scroll bg-[#131313] pb-20">
-        {tab}
+        {walletAddress !== undefined ? tab : walletSection}
       </div>
     </>
   );
