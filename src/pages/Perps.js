@@ -83,7 +83,8 @@ function Perps() {
         dispatch(postTrade(param));
       }
     } catch (error) {
-      console.log(error);
+      setLoading(false);
+      toast.error("Transaction rejected by the user");
     }
   };
 
