@@ -41,7 +41,7 @@ export const connectWallet = createAsyncThunk(
   async () => {
     let account;
     if (typeof window.ethereum === "undefined") {
-      toast.error("Please install coinbase wallet");
+      toast.error("Please install wallet");
     } else {
       const accounts = await window.ethereum.request({
         method: "eth_accounts",
