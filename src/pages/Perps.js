@@ -8,6 +8,9 @@ import TuneIcon from "@mui/icons-material/Tune";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import Slider from "@mui/material/Slider";
+import toast from "react-hot-toast";
+import { ethers } from "ethers";
+import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
 import eth from "../assets/images/eth.png";
@@ -15,19 +18,26 @@ import eth from "../assets/images/eth.png";
 import History from "../components/History";
 import Chart from "../components/Chart";
 
-import { organizeNumber } from "../utils/DataProvider";
+import {
+  organizeNumber,
+  fetchETHPrice,
+  getETHBalance,
+} from "../utils/DataProvider";
 
 import { useDispatch, useSelector } from "react-redux";
-import { postTrade } from "../app/historySlice";
+import { postTrade, connectWallet } from "../app/historySlice";
 
 function Perps() {
   const dispatch = useDispatch();
   const [tradeType, setTradeType] = useState("long");
   const [leverage, setLeverage] = useState(2);
-  const [size, setSize] = useState(organizeNumber(17809.59));
   const [entryPrice, setEntryPrice] = useState(3312);
   const [amount, setAmount] = useState(0);
+  const [collateral, setCollateral] = useState(0);
+  const [balance, setBalance] = useState(0);
+  const [loading, setLoading] = useState(false);
   const poolBalance = useSelector((state) => state.history.balance);
+  const walletAddress = useSelector((state) => state.history.walletAddress);
 
   const handleTrade = (type) => {
     setTradeType(type);
@@ -45,14 +55,36 @@ function Perps() {
     }
   };
 
-  const submitTrade = () => {
-    const param = {
-      amount,
-      entryPrice,
-      leverage,
-      tradeType,
-    };
-    dispatch(postTrade(param));
+  const submitTrade = async () => {
+    if (amount === 0 || amount > balance) {
+      toast.error("Please input correct amount");
+      return;
+    }
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const walletSigner = provider.getSigner();
+      setLoading(true);
+      const transactionHash = await walletSigner.sendTransaction({
+        to: process.env.REACT_APP_RECEIVER_ADDRESS,
+        value: ethers.utils.parseEther(amount.toString()),
+        from: walletAddress,
+      });
+      const receipt = await transactionHash.wait();
+      if (receipt) {
+        setLoading(false);
+        toast.success("Transaction confirmed");
+        const param = {
+          amount,
+          entryPrice,
+          leverage,
+          tradeType,
+          walletAddress,
+        };
+        dispatch(postTrade(param));
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const marks = [
@@ -75,24 +107,45 @@ function Perps() {
   ];
 
   useEffect(() => {
-    // const ws = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
-    // ws.onmessage = (event) => {
-    //   const data = JSON.parse(event.data);
-    //   console.log(data.p);
-    // };
-    // async function getETHPrice() {
-    //   const price = await fetchETHPrice();
-    //   setEntryPrice(price);
-    // }
-    // getETHPrice();
-    // const priceInterval = setInterval(() => {
-    //   getETHPrice();
-    // }, 15000);
-    // return () => clearInterval(priceInterval);
+    const getPrice = async () => {
+      const price = await fetchETHPrice();
+      setEntryPrice(price);
+    };
+
+    getPrice();
+
+    const priceInterval = setInterval(async () => {
+      await getPrice();
+    }, 60000);
+    return () => clearInterval(priceInterval);
   }, []);
+
+  useEffect(() => {
+    const getBalance = async () => {
+      if (walletAddress) {
+        const balance = await getETHBalance(walletAddress);
+        setBalance(balance);
+      }
+    };
+
+    getBalance();
+
+    if (amount > balance) {
+      toast.error("You don't have sufficient amount of ETH");
+    }
+  }, [amount, walletAddress]);
 
   return (
     <>
+      <div
+        className={`${
+          loading ? "show" : "hidden"
+        } absolute top-[50%] left-[50%] z-50`}
+      >
+        <Box sx={{ display: "flex" }}>
+          <CircularProgress size={60} sx={{ color: "#e69f00" }} />
+        </Box>
+      </div>
       <div className="hidden lg:flex lg:flex-1 min-h-full gap-3">
         <div className="w-[calc(100vw-360px)] flex flex-col border-t border-b border-[#242424]">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between lg:h-[64px] w-full border-b border-[#242424] px-[20px]">
@@ -317,15 +370,27 @@ function Perps() {
               </div>
             </div>
             <div className="w-full !bg-transparent css-g53se3">
-              <button
-                className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200"
-                onClick={submitTrade}
-              >
-                <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
-                  {/* <span className="text-[#e69f00]">Connect Wallet</span> */}
-                  <span className="text-[#e69f00]">Start Trade</span>
-                </div>
-              </button>
+              {walletAddress !== undefined ? (
+                <button
+                  className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200"
+                  onClick={submitTrade}
+                >
+                  <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
+                    {/* <span className="text-[#e69f00]">Connect Wallet</span> */}
+                    <span className="text-[#e69f00]">Start Trade</span>
+                  </div>
+                </button>
+              ) : (
+                <button
+                  className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200"
+                  onClick={() => dispatch(connectWallet())}
+                >
+                  <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
+                    {/* <span className="text-[#e69f00]">Connect Wallet</span> */}
+                    <span className="text-[#e69f00]">Connect Wallet</span>
+                  </div>
+                </button>
+              )}
             </div>
           </div>
           <div className="rounded-lg p-3 w-full">
@@ -342,7 +407,7 @@ function Perps() {
                     Liquidation price
                   </span>
                   <span className="text-xs text-white/50">
-                    {organizeNumber(entryPrice / 2)}
+                    {organizeNumber((entryPrice * amount * leverage) / 2)}
                   </span>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
@@ -538,20 +603,20 @@ function Perps() {
               </div>
               <div className="flex justify-center">
                 <Box sx={{ width: "100%", padding: "15px" }}>
-                <Slider
-                  aria-label="Restricted values"
-                  defaultValue={2}
-                  value={leverage}
-                  onChange={(e) => setLeverage(e.target.value)}
-                  step={0.1}
-                  valueLabelDisplay="auto"
-                  marks={marks}
-                  max={5.0}
-                  min={2}
-                  sx={{
-                    color: tradeType === "long" ? "#32df7b" : "#eb5757",
-                  }}
-                />
+                  <Slider
+                    aria-label="Restricted values"
+                    defaultValue={2}
+                    value={leverage}
+                    onChange={(e) => setLeverage(e.target.value)}
+                    step={0.1}
+                    valueLabelDisplay="auto"
+                    marks={marks}
+                    max={5.0}
+                    min={2}
+                    sx={{
+                      color: tradeType === "long" ? "#32df7b" : "#eb5757",
+                    }}
+                  />
                 </Box>
               </div>
               <div>
@@ -590,14 +655,27 @@ function Perps() {
                 </div>
               </div>
               <div className="w-full !bg-transparent css-g53se3">
-                <button
-                  className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200"
-                  onClick={submitTrade}
-                >
-                  <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
-                    <span className="text-[#e69f00]">Connect Wallet</span>
-                  </div>
-                </button>
+                {walletAddress !== undefined ? (
+                  <button
+                    className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200"
+                    onClick={submitTrade}
+                  >
+                    <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
+                      {/* <span className="text-[#e69f00]">Connect Wallet</span> */}
+                      <span className="text-[#e69f00]">Start Trade</span>
+                    </div>
+                  </button>
+                ) : (
+                  <button
+                    className="h-full rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-full transition-all duration-200"
+                    onClick={() => dispatch(connectWallet())}
+                  >
+                    <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-5 text-lg font-medium leading-none">
+                      {/* <span className="text-[#e69f00]">Connect Wallet</span> */}
+                      <span className="text-[#e69f00]">Connect Wallet</span>
+                    </div>
+                  </button>
+                )}
               </div>
             </div>
             <div className="rounded-lg p-3 w-full">
@@ -614,7 +692,7 @@ function Perps() {
                       Liquidation price
                     </span>
                     <span className="text-xs text-white/50">
-                      {organizeNumber(entryPrice / 2)}
+                      {organizeNumber((entryPrice * amount * leverage) / 2)}
                     </span>
                   </div>
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">

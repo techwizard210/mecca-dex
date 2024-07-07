@@ -4,7 +4,6 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 export async function postTrade(amount, entryPrice, leverage, tradeType) {
   const param = {
     amount: amount,
-    entryPrice: entryPrice,
     leverage: leverage,
     tradeType: tradeType,
   };
@@ -35,7 +34,6 @@ export async function getTradeHistory() {
 
 export async function quitTrade(tradeId, entryPrice) {
   const param = {
-    endPrice: entryPrice,
     tradeId: tradeId,
   };
   let trades = [];
