@@ -56,35 +56,36 @@ function Perps() {
   };
 
   const submitTrade = async () => {
-    if (amount === 0 || amount > balance) {
+    if (amount == 0 || amount > balance) {
       toast.error("Please input correct amount");
       return;
-    }
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const walletSigner = provider.getSigner();
-      setLoading(true);
-      const transactionHash = await walletSigner.sendTransaction({
-        to: process.env.REACT_APP_RECEIVER_ADDRESS,
-        value: ethers.utils.parseEther(amount.toString()),
-        from: walletAddress,
-      });
-      const receipt = await transactionHash.wait();
-      if (receipt) {
+    } else {
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const walletSigner = provider.getSigner();
+        setLoading(true);
+        const transactionHash = await walletSigner.sendTransaction({
+          to: process.env.REACT_APP_RECEIVER_ADDRESS,
+          value: ethers.utils.parseEther(amount.toString()),
+          from: walletAddress,
+        });
+        const receipt = await transactionHash.wait();
+        if (receipt) {
+          setLoading(false);
+          toast.success("Transaction confirmed");
+          const param = {
+            amount,
+            entryPrice,
+            leverage,
+            tradeType,
+            walletAddress,
+          };
+          dispatch(postTrade(param));
+        }
+      } catch (error) {
         setLoading(false);
-        toast.success("Transaction confirmed");
-        const param = {
-          amount,
-          entryPrice,
-          leverage,
-          tradeType,
-          walletAddress,
-        };
-        dispatch(postTrade(param));
+        toast.error("Transaction rejected by the user");
       }
-    } catch (error) {
-      setLoading(false);
-      toast.error("Transaction rejected by the user");
     }
   };
 
