@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getTradeHistory, quitTrade } from "../app/historySlice";
 import { organizeNumber, convertUnixTime } from "../utils/DataProvider";
 import { connectWallet } from "../app/historySlice";
+import toast from "react-hot-toast";
 
 function History(props) {
   const dispatch = useDispatch();
@@ -58,11 +59,13 @@ function History(props) {
                     )}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(history.entryPrice * history.amount * history.leverage)}
+                    {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber((history.entryPrice * history.amount * history.leverage) /
-                      2)}
+                    {organizeNumber(
+                      (history.entryPrice * history.amount * history.leverage) /
+                        2
+                    )}
                   </span>
                   <span className="flex-1 text-center">
                     {convertUnixTime(history.startDate)}
@@ -130,10 +133,14 @@ function History(props) {
                     {history.leverage}x
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(history.entryPrice * history.amount * history.leverage)}
+                    {organizeNumber(
+                      history.entryPrice * history.amount * history.leverage
+                    )}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(history.endPrice * history.amount * history.leverage)}
+                    {organizeNumber(
+                      history.endPrice * history.amount * history.leverage
+                    )}
                   </span>
                   <span className="flex-1 text-center">
                     {organizeNumber(history.executionFee)}
@@ -142,11 +149,13 @@ function History(props) {
                     {organizeNumber(history.profit)}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(history.entryPrice * history.amount * history.leverage)}
+                    {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber((history.entryPrice * history.amount * history.leverage) /
-                      2)}
+                    {organizeNumber(
+                      (history.entryPrice * history.amount * history.leverage) /
+                        2
+                    )}
                   </span>
                   <span className="flex-1 text-center">
                     {convertUnixTime(history.startDate)}
@@ -223,9 +232,7 @@ function History(props) {
                     {organizeNumber(history.profit)}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(
-                      history.entryPrice * history.amount * history.leverage
-                    )}
+                    {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
                     {organizeNumber(
@@ -273,13 +280,16 @@ function History(props) {
     }
   }, [walletAddress]);
 
-  function exitTrade(tradeId) {
+  async function exitTrade(tradeId) {
     const param = {
       tradeId: tradeId,
       endPrice: props.ethPrice,
       walletAddress,
     };
-    dispatch(quitTrade(param));
+    props.setLoading(true);
+    await dispatch(quitTrade(param));
+    props.setLoading(false);
+    toast.success("Closed successfully");
   }
 
   return (
