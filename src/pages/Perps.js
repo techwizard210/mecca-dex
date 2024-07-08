@@ -192,7 +192,7 @@ function Perps() {
             </div>
           </div>
           <Chart />
-          <History ethPrice={entryPrice} />
+          <History ethPrice={entryPrice} setLoading={setLoading} />
         </div>
         <div className="w-[360px] bg-[#131313] flex flex-col text-white text-[25px]">
           <div className="bg-[#1b1b1b] px-4 py-5 flex flex-col gap-4">
