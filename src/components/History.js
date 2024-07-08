@@ -68,16 +68,20 @@ function History(props) {
                     )}
                   </span>
                   <span className="flex-1 text-center">
-                  {organizeNumber(
-                      (history.entryPrice - props.ethPrice) *
-                        history.amount *
-                        history.leverage
-                    )}
+                    {history.type === "long"
+                      ? organizeNumber(
+                          (props.ethPrice - history.entryPrice) *
+                            history.amount *
+                            history.leverage
+                        )
+                      : organizeNumber(
+                          (history.entryPrice - props.ethPrice) *
+                            history.amount *
+                            history.leverage
+                        )}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(
-                      history.entryPrice * history.amount
-                    )}
+                    {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
                     {organizeNumber(
