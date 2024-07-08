@@ -346,7 +346,7 @@ function Perps() {
                         translate="no"
                         className="text-xs text-white/75 mt-0.5"
                       >
-                        <span>{entryPrice} USD</span>
+                        <span>{organizeNumber(entryPrice * amount)} USD</span>
                       </div>
                     </div>
                   </div>
@@ -364,7 +364,9 @@ function Perps() {
                         translate="no"
                         className="text-xs h-[14px] text-white/75"
                       >
-                        <span>{entryPrice * amount * leverage} USD</span>
+                        <span>
+                          {organizeNumber(entryPrice * amount * leverage)} USD
+                        </span>
                       </span>
                     </div>
                   </div>
@@ -631,7 +633,7 @@ function Perps() {
                           translate="no"
                           className="text-xs text-white/75 mt-0.5"
                         >
-                          <span>{entryPrice} USD</span>
+                          <span>{entryPrice * amount} USD</span>
                         </div>
                       </div>
                     </div>
@@ -649,7 +651,9 @@ function Perps() {
                           translate="no"
                           className="text-xs h-[14px] text-white/75"
                         >
-                          <span>{entryPrice * amount * leverage} USD</span>
+                          <span>
+                            {organizeNumber(entryPrice * amount * leverage)} USD
+                          </span>
                         </span>
                       </div>
                     </div>

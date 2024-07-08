@@ -71,5 +71,6 @@ export const getETHBalance = async (address) => {
 
   // Fetch the balance of the specified address
   const balance = await provider.getBalance(address);
+  console.log(ethers.utils.formatEther(balance));
   return ethers.utils.formatEther(balance);
 };

@@ -48,6 +48,7 @@ export const connectWallet = createAsyncThunk(
       });
       if (accounts.length > 0) {
         account = accounts[0];
+        console.log(accounts);
       } else {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
