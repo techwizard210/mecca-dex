@@ -21,9 +21,12 @@ function History(props) {
         <div className="flex justify-between border-b border-[#242424] py-3">
           <span className="flex-1 text-center">Trade Type</span>
           <span className="flex-1 text-center">Entry Price</span>
+          <span className="flex-1 text-center">Current Price</span>
           <span className="flex-1 text-center">Amount</span>
           <span className="flex-1 text-center">Leverage</span>
-          <span className="flex-1 text-center">Size</span>
+          <span className="flex-1 text-center">Entry Size</span>
+          <span className="flex-1 text-center">Current Size</span>
+          <span className="flex-1 text-center">Profit</span>
           <span className="flex-1 text-center">Collateral</span>
           <span className="flex-1 text-center">Liq.Price</span>
           <span className="flex-1 text-center">Start Date</span>
@@ -49,6 +52,7 @@ function History(props) {
                   <span className="flex-1 text-center">
                     {history.entryPrice}
                   </span>
+                  <span className="flex-1 text-center">{props.ethPrice}</span>
                   <span className="flex-1 text-center">{history.amount}</span>
                   <span className="flex-1 text-center">
                     {history.leverage}x
@@ -59,7 +63,21 @@ function History(props) {
                     )}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(history.entryPrice * history.amount)}
+                    {organizeNumber(
+                      props.ethPrice * history.amount * history.leverage
+                    )}
+                  </span>
+                  <span className="flex-1 text-center">
+                  {organizeNumber(
+                      (history.entryPrice - props.ethPrice) *
+                        history.amount *
+                        history.leverage
+                    )}
+                  </span>
+                  <span className="flex-1 text-center">
+                    {organizeNumber(
+                      history.entryPrice * history.amount
+                    )}
                   </span>
                   <span className="flex-1 text-center">
                     {organizeNumber(
