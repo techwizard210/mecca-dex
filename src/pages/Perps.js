@@ -224,17 +224,17 @@ function Perps() {
                 </button>
               </div>
               <div className="flex items-center">
-                <IconButton aria-label="add an alarm">
+                {/* <IconButton aria-label="add an alarm">
                   <RefreshIcon />
                 </IconButton>
                 <IconButton aria-label="add an alarm">
                   <TuneIcon />
-                </IconButton>
+                </IconButton> */}
               </div>
             </div>
             <div>
               <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
-                You're paying
+                Pay
               </div>
               <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                 <div className="flex flex-col dark:text-white h-full justify-center">
@@ -261,7 +261,7 @@ function Perps() {
             </div>
             <div>
               <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
-                Size of {tradeType === "long" ? "Long" : "Short"}
+                {tradeType === "long" ? "Long" : "Short"}
               </div>
               <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                 <div className="flex flex-col dark:text-white h-full justify-center">
@@ -513,17 +513,17 @@ function Perps() {
                   </button>
                 </div>
                 <div className="flex items-center">
-                  <IconButton aria-label="add an alarm">
+                  {/* <IconButton aria-label="add an alarm">
                     <RefreshIcon />
                   </IconButton>
                   <IconButton aria-label="add an alarm">
                     <TuneIcon />
-                  </IconButton>
+                  </IconButton> */}
                 </div>
               </div>
               <div>
                 <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
-                  You're paying
+                  pay
                 </div>
                 <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                   <div className="flex flex-col dark:text-white h-full justify-center">
@@ -550,7 +550,7 @@ function Perps() {
               </div>
               <div>
                 <div className="text-white text-xs font-[500] flex flex-row justify-between px-2 lg:px-4">
-                  Size of {tradeType === "long" ? "Long" : "Short"}
+                  {tradeType === "long" ? "Long" : "Short"}
                 </div>
                 <div className="bg-[#272626] rounded-xl h-14 pl-3 pr-2 py-2 lg:p-4 mt-2">
                   <div className="flex flex-col dark:text-white h-full justify-center">
