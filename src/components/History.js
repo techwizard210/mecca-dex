@@ -84,10 +84,7 @@ function History(props) {
                     {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(
-                      (history.entryPrice * history.amount * history.leverage) /
-                        2
-                    )}
+                    {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
                     {convertUnixTime(history.startDate)}
@@ -174,10 +171,7 @@ function History(props) {
                     {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(
-                      (history.entryPrice * history.amount * history.leverage) /
-                        2
-                    )}
+                    {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
                     {convertUnixTime(history.startDate)}
@@ -257,10 +251,7 @@ function History(props) {
                     {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(
-                      (history.entryPrice * history.amount * history.leverage) /
-                        2
-                    )}
+                    {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
                     {convertUnixTime(history.startDate)}
