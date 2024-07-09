@@ -19,17 +19,17 @@ function History(props) {
     tab = (
       <div className="flex flex-col text-[#84897a] text-[13px] w-[900px] overflow-hidden md:w-full lg:w-full">
         <div className="flex justify-between border-b border-[#242424] py-3">
-          <span className="flex-1 text-center">Trade Type</span>
-          <span className="flex-1 text-center">Entry Price</span>
-          <span className="flex-1 text-center">Current Price</span>
-          <span className="flex-1 text-center">Amount</span>
-          <span className="flex-1 text-center">Leverage</span>
-          <span className="flex-1 text-center">Entry Size</span>
-          <span className="flex-1 text-center">Current Size</span>
-          <span className="flex-1 text-center">Profit</span>
+          <span className="flex-1 text-center">Type</span>
           <span className="flex-1 text-center">Collateral</span>
+          <span className="flex-1 text-center">Leverage</span>
+          <span className="flex-1 text-center">Entry Price</span>
+          <span className="flex-1 text-center">Size</span>
+          <span className="flex-1 text-center">Position($)</span>
+          <span className="flex-1 text-center">Current Price</span>
+          {/* <span className="flex-1 text-center">Entry Size</span> */}
+          <span className="flex-1 text-center">Profit/Loss</span>
           <span className="flex-1 text-center">Liq.Price</span>
-          <span className="flex-1 text-center">Start Date</span>
+          <span className="flex-1 text-center">Timestamp</span>
           <span className="flex-1 text-center">Action</span>
         </div>
         {tradeHistory.filter((item) => item.profit === undefined).length ===
@@ -47,26 +47,24 @@ function History(props) {
                   key={index}
                 >
                   <span className={`flex-1 text-center ${history.type}`}>
-                    {history.type} trade
+                    {history.type.toUpperCase()}
                   </span>
                   <span className="flex-1 text-center">
-                    {history.entryPrice}
+                    {organizeNumber(history.entryPrice * history.amount)}
                   </span>
-                  <span className="flex-1 text-center">{props.ethPrice}</span>
-                  <span className="flex-1 text-center">{history.amount}</span>
                   <span className="flex-1 text-center">
                     {history.leverage}x
                   </span>
                   <span className="flex-1 text-center">
-                    {organizeNumber(
-                      history.entryPrice * history.amount * history.leverage
-                    )}
+                    {history.entryPrice}
                   </span>
+                  <span className="flex-1 text-center">{history.amount}</span>
                   <span className="flex-1 text-center">
                     {organizeNumber(
                       props.ethPrice * history.amount * history.leverage
                     )}
                   </span>
+                  <span className="flex-1 text-center">{props.ethPrice}</span>
                   <span className="flex-1 text-center">
                     {history.type === "long"
                       ? organizeNumber(
@@ -79,9 +77,6 @@ function History(props) {
                             history.amount *
                             history.leverage
                         )}
-                  </span>
-                  <span className="flex-1 text-center">
-                    {organizeNumber(history.entryPrice * history.amount)}
                   </span>
                   <span className="flex-1 text-center">
                     {organizeNumber(history.entryPrice * history.amount)}
@@ -109,16 +104,16 @@ function History(props) {
     tab = (
       <div className="flex flex-col text-[#84897a] text-[13px] w-[900px] overflow-hidden md:w-full lg:w-full">
         <div className="flex justify-between border-b border-[#242424] py-3">
-          <span className="flex-1 text-center">Trade Type</span>
+          <span className="flex-1 text-center">Type</span>
+          <span className="flex-1 text-center">Collateral</span>
+          <span className="flex-1 text-center">Leverage</span>
+          <span className="flex-1 text-center">Amount</span>
           <span className="flex-1 text-center">Entry Price</span>
           <span className="flex-1 text-center">End Price</span>
-          <span className="flex-1 text-center">Amount</span>
-          <span className="flex-1 text-center">Leverage</span>
           <span className="flex-1 text-center">Entry Size</span>
           <span className="flex-1 text-center">End Size</span>
           <span className="flex-1 text-center">Execution Fee</span>
-          <span className="flex-1 text-center">Profit</span>
-          <span className="flex-1 text-center">Collateral</span>
+          <span className="flex-1 text-center">Profit/Loss</span>
           <span className="flex-1 text-center">Liq.Price</span>
           <span className="flex-1 text-center">Start Date</span>
           <span className="flex-1 text-center">End Date</span>
