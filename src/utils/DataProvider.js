@@ -141,17 +141,16 @@ export const convertUnixTime = (unixtime) => {
 };
 
 export const fetchETHPrice = async () => {
-  // const response = await axios.get(
-  //   "https://api.coingecko.com/api/v3/simple/price",
-  //   {
-  //     params: {
-  //       ids: "ethereum",
-  //       vs_currencies: "usd",
-  //     },
-  //   }
-  // );
-  // return response.data.ethereum.usd;
-  return 2500;
+  const response = await axios.get(
+    "https://api.coingecko.com/api/v3/simple/price",
+    {
+      params: {
+        ids: "ethereum",
+        vs_currencies: "usd",
+      },
+    }
+  );
+  return response.data.ethereum.usd;
 };
 
 export const shortenAddress = (address) => {
