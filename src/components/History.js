@@ -65,19 +65,35 @@ function History(props) {
                     )}
                   </span>
                   <span className="flex-1 text-center">{props.ethPrice}</span>
-                  <span className="flex-1 text-center">
-                    {history.type === "long"
-                      ? organizeNumber(
-                          (props.ethPrice - history.entryPrice) *
-                            history.amount *
-                            history.leverage
-                        )
-                      : organizeNumber(
-                          (history.entryPrice - props.ethPrice) *
-                            history.amount *
-                            history.leverage
-                        )}
-                  </span>
+                  {history.type === "long" ? (
+                    <span
+                      className={`${
+                        props.ethPrice - history.entryPrice >= 0
+                          ? "long"
+                          : "short"
+                      } flex-1 text-center`}
+                    >
+                      {organizeNumber(
+                        (props.ethPrice - history.entryPrice) *
+                          history.amount *
+                          history.leverage
+                      )}
+                    </span>
+                  ) : (
+                    <span
+                      className={`${
+                        props.ethPrice - history.entryPrice < 0
+                          ? "long"
+                          : "short"
+                      } flex-1 text-center`}
+                    >
+                      {organizeNumber(
+                        (history.entryPrice - props.ethPrice) *
+                          history.amount *
+                          history.leverage
+                      )}
+                    </span>
+                  )}
                   <span className="flex-1 text-center">
                     {organizeNumber(history.entryPrice * history.amount)}
                   </span>
@@ -104,13 +120,13 @@ function History(props) {
     tab = (
       <div className="flex flex-col text-[#84897a] text-[13px] w-[900px] overflow-hidden md:w-full lg:w-full">
         <div className="flex justify-between border-b border-[#242424] py-3">
-        <span className="flex-1 text-center">Type</span>
+          <span className="flex-1 text-center">Type</span>
           <span className="flex-1 text-center">Entry Price</span>
           <span className="flex-1 text-center">End Price</span>
-          <span className="flex-1 text-center">Amount</span>
+          <span className="flex-1 text-center">Size</span>
           <span className="flex-1 text-center">Leverage</span>
-          <span className="flex-1 text-center">Entry Size</span>
-          <span className="flex-1 text-center">End Size</span>
+          <span className="flex-1 text-center">Entry Position($)</span>
+          <span className="flex-1 text-center">End Position($)</span>
           <span className="flex-1 text-center">Execution Fee</span>
           <span className="flex-1 text-center">Profit</span>
           <span className="flex-1 text-center">Collateral</span>
@@ -159,7 +175,11 @@ function History(props) {
                   <span className="flex-1 text-center">
                     {organizeNumber(history.executionFee)}
                   </span>
-                  <span className="flex-1 text-center">
+                  <span
+                    className={`${
+                      history.profit >= 0 ? "long" : "short"
+                    } flex-1 text-center`}
+                  >
                     {organizeNumber(history.profit)}
                   </span>
                   <span className="flex-1 text-center">
@@ -184,13 +204,13 @@ function History(props) {
     tab = (
       <div className="flex flex-col text-[#84897a] text-[13px] w-[900px] overflow-hidden md:w-full lg:w-full">
         <div className="flex justify-between border-b border-[#242424] py-3">
-          <span className="flex-1 text-center">Trade Type</span>
+          <span className="flex-1 text-center">Type</span>
           <span className="flex-1 text-center">Entry Price</span>
           <span className="flex-1 text-center">End Price</span>
-          <span className="flex-1 text-center">Amount</span>
+          <span className="flex-1 text-center">Size</span>
           <span className="flex-1 text-center">Leverage</span>
-          <span className="flex-1 text-center">Entry Size</span>
-          <span className="flex-1 text-center">End Size</span>
+          <span className="flex-1 text-center">Entry Position($)</span>
+          <span className="flex-1 text-center">End Position($)</span>
           <span className="flex-1 text-center">Execution Fee</span>
           <span className="flex-1 text-center">Profit</span>
           <span className="flex-1 text-center">Collateral</span>
@@ -216,7 +236,7 @@ function History(props) {
                   key={index}
                 >
                   <span className={`flex-1 text-center ${history.type}`}>
-                    {history.type} trade
+                    {history.type.toUpperCase()}
                   </span>
                   <span className="flex-1 text-center">
                     {history.entryPrice}
@@ -239,7 +259,11 @@ function History(props) {
                   <span className="flex-1 text-center">
                     {organizeNumber(history.executionFee)}
                   </span>
-                  <span className="flex-1 text-center">
+                  <span
+                    className={`${
+                      history.profit >= 0 ? "long" : "short"
+                    } flex-1 text-center`}
+                  >
                     {organizeNumber(history.profit)}
                   </span>
                   <span className="flex-1 text-center">
