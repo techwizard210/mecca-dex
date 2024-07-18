@@ -36,8 +36,13 @@ function Perps() {
   const [collateral, setCollateral] = useState(0);
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [txConfirmModal, setTxConfirmModal] = useState(false);
+
   const poolBalance = useSelector((state) => state.history.balance);
   const walletAddress = useSelector((state) => state.history.walletAddress);
+  const userBalance = useSelector((state) => state.history.userBalance);
+
+  const txConfirmModalRef = useRef();
 
   const handleTrade = (type) => {
     setTradeType(type);
@@ -56,37 +61,57 @@ function Perps() {
   };
 
   const submitTrade = async () => {
-    if (amount == 0 || amount > balance) {
+    if (amount == 0 || amount > userBalance) {
       toast.error("Please input correct amount");
       return;
     } else {
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const walletSigner = provider.getSigner();
-        setLoading(true);
-        const transactionHash = await walletSigner.sendTransaction({
-          to: process.env.REACT_APP_RECEIVER_ADDRESS,
-          value: ethers.utils.parseEther(amount.toString()),
-          from: walletAddress,
-        });
-        const receipt = await transactionHash.wait();
-        if (receipt) {
-          setLoading(false);
-          toast.success("Transaction confirmed");
-          const param = {
-            amount,
-            entryPrice,
-            leverage,
-            tradeType,
-            walletAddress,
-          };
-          dispatch(postTrade(param));
-        }
-      } catch (error) {
-        setLoading(false);
-        toast.error("Transaction rejected by the user");
-      }
+      // try {
+      //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+      //   const walletSigner = provider.getSigner();
+      //   setLoading(true);
+      //   const transactionHash = await walletSigner.sendTransaction({
+      //     to: process.env.REACT_APP_RECEIVER_ADDRESS,
+      //     value: ethers.utils.parseEther(amount.toString()),
+      //     from: walletAddress,
+      //   });
+      //   const receipt = await transactionHash.wait();
+      //   if (receipt) {
+      //     setLoading(false);
+      //     toast.success("Transaction confirmed");
+      //     const param = {
+      //       amount,
+      //       entryPrice,
+      //       leverage,
+      //       tradeType,
+      //       walletAddress,
+      //     };
+      //     dispatch(postTrade(param));
+      //   }
+      // } catch (error) {
+      //   setLoading(false);
+      //   toast.error("Transaction rejected by the user");
+      // }
+      setLoading(true);
+      setTxConfirmModal(true);
     }
+  };
+
+  const continuePostTrade = async () => {
+    const param = {
+      amount,
+      entryPrice,
+      leverage,
+      tradeType,
+      walletAddress,
+    };
+    await dispatch(postTrade(param));
+    setLoading(false);
+    setTxConfirmModal(false);
+  };
+
+  const cancelTX = async () => {
+    setLoading(false);
+    setTxConfirmModal(false);
   };
 
   const marks = [
@@ -123,22 +148,37 @@ function Perps() {
   }, []);
 
   useEffect(() => {
-    const getBalance = async () => {
-      if (walletAddress) {
-        const balance = await getETHBalance(walletAddress);
-        setBalance(balance);
-      }
-    };
-
-    getBalance();
-
-    if (amount > balance) {
+    if (amount > userBalance) {
       toast.error("You don't have sufficient amount of ETH");
     }
   }, [amount, walletAddress]);
 
   return (
     <>
+      <div
+        className={`text-[#84897a] absolute top-[50px] right-[10px] z-40 p-[40px] pb-[30px] bg-[#1b1b1b] w-[250px] flex flex-col gap-2 rounded transition-all duration-200 ${
+          txConfirmModal === true ? "block" : "hidden"
+        }`}
+        ref={txConfirmModalRef}
+      >
+        <h4>Are you sure to send {amount} ETH ?</h4>
+        <button
+          className="rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-100 transition-all duration-200 mt-3"
+          onClick={continuePostTrade}
+        >
+          <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-2 px-5 text-lg font-medium leading-none">
+            <span className="text-[#e69f00] text-[16px]">Confirm</span>
+          </div>
+        </button>
+        <button
+          className="rounded-xl text-white group bg-[#E69F00]/10 hover:bg-[#E69F00]/25 w-100 transition-all duration-200 mt-3"
+          onClick={cancelTX}
+        >
+          <div className="rounded-xl bg-clip-text text-transparent group-disabled:bg-none py-2 px-5 text-lg font-medium leading-none">
+            <span className="text-white text-[16px]">Cancel</span>
+          </div>
+        </button>
+      </div>
       <div
         className={`${
           loading ? "show" : "hidden"
@@ -149,51 +189,6 @@ function Perps() {
         </Box>
       </div>
       <div className="hidden lg:flex lg:flex-1 min-h-full gap-3">
-        <div className="w-[calc(100vw-360px)] flex flex-col border-t border-b border-[#242424]">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between lg:h-[64px] w-full border-b border-[#242424] px-[20px]">
-            <div className="p-1 lg:p-1 lg:pr-4 rounded-lg flex items-center">
-              <img src={eth} alt="eth icon" className="w-[40px]" />
-              <div className="font-semibold text-xs lg:text-base text-white">
-                ETH-PERP
-              </div>
-            </div>
-            <div className="flex gap-7 items-center">
-              <div className="text-white">${organizeNumber(entryPrice)}</div>
-              <div className="flex gap-3 xl:gap-7">
-                <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">
-                    24h change
-                  </p>
-                  <div className="text-xs text-white">2.42%</div>
-                </div>
-                <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">
-                    24h Vol
-                  </p>
-                  <div className="text-xs text-white">23.16M</div>
-                </div>
-                <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">
-                    24h High
-                  </p>
-                  <div className="text-xs text-white">
-                    ${organizeNumber(3512.22)}
-                  </div>
-                </div>
-                <div className="flex flex-col text-center">
-                  <p className="text-xs text-white/30 whitespace-nowrap">
-                    24h Low
-                  </p>
-                  <div className="text-xs text-white">
-                    ${organizeNumber(3389.31)}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <Chart />
-          <History ethPrice={entryPrice} setLoading={setLoading} />
-        </div>
         <div className="w-[360px] bg-[#131313] flex flex-col text-white text-[25px]">
           <div className="bg-[#1b1b1b] px-4 py-5 flex flex-col gap-4">
             <div className="flex items-center justify-between">
@@ -411,7 +406,7 @@ function Perps() {
                     Liquidation price
                   </span>
                   <span className="text-xs text-white/50">
-                    {organizeNumber((entryPrice * amount * leverage) / 2)}
+                    ${organizeNumber(entryPrice * (1 - 1 / leverage))}
                   </span>
                 </div>
                 <div className="flex flex-col lg:flex-row justify-between lg:items-center">
@@ -443,6 +438,51 @@ function Perps() {
               </div>
             </div>
           </div>
+        </div>
+        <div className="w-[calc(100vw-360px)] flex flex-col border-t border-b border-[#242424]">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between lg:h-[64px] w-full border-b border-[#242424] px-[20px]">
+            <div className="p-1 lg:p-1 lg:pr-4 rounded-lg flex items-center">
+              <img src={eth} alt="eth icon" className="w-[40px]" />
+              <div className="font-semibold text-xs lg:text-base text-white">
+                ETH-PERP
+              </div>
+            </div>
+            <div className="flex gap-7 items-center">
+              <div className="text-white">${organizeNumber(entryPrice)}</div>
+              <div className="flex gap-3 xl:gap-7">
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h change
+                  </p>
+                  <div className="text-xs text-white">2.42%</div>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h Vol
+                  </p>
+                  <div className="text-xs text-white">23.16M</div>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h High
+                  </p>
+                  <div className="text-xs text-white">
+                    ${organizeNumber(3512.22)}
+                  </div>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-xs text-white/30 whitespace-nowrap">
+                    24h Low
+                  </p>
+                  <div className="text-xs text-white">
+                    ${organizeNumber(3389.31)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Chart />
+          <History ethPrice={entryPrice} setLoading={setLoading} />
         </div>
       </div>
       <div className="flex lg:hidden min-h-full w-100">
@@ -698,7 +738,7 @@ function Perps() {
                       Liquidation price
                     </span>
                     <span className="text-xs text-white/50">
-                      {organizeNumber((entryPrice * amount * leverage) / 2)}
+                      {organizeNumber(entryPrice * (1 - 1 / leverage))}
                     </span>
                   </div>
                   <div className="flex flex-col lg:flex-row justify-between lg:items-center">

@@ -22,10 +22,11 @@ function History(props) {
           <span className="flex-1 text-center">Type</span>
           <span className="flex-1 text-center">Collateral</span>
           <span className="flex-1 text-center">Leverage</span>
-          <span className="flex-1 text-center">Entry Price</span>
           <span className="flex-1 text-center">Size</span>
-          <span className="flex-1 text-center">Position($)</span>
+          <span className="flex-1 text-center">Entry Price</span>
+          <span className="flex-1 text-center">Entry Position($)</span>
           <span className="flex-1 text-center">Current Price</span>
+          <span className="flex-1 text-center">Current Position($)</span>
           {/* <span className="flex-1 text-center">Entry Size</span> */}
           <span className="flex-1 text-center">Profit/Loss</span>
           <span className="flex-1 text-center">Liq.Price</span>
@@ -56,15 +57,22 @@ function History(props) {
                     {history.leverage}x
                   </span>
                   <span className="flex-1 text-center">
+                    {history.amount * history.leverage}
+                  </span>
+                  <span className="flex-1 text-center">
                     {history.entryPrice}
                   </span>
-                  <span className="flex-1 text-center">{history.amount}</span>
+                  <span className="flex-1 text-center">
+                    {organizeNumber(
+                      history.entryPrice * history.amount * history.leverage
+                    )}
+                  </span>
+                  <span className="flex-1 text-center">{props.ethPrice}</span>
                   <span className="flex-1 text-center">
                     {organizeNumber(
                       props.ethPrice * history.amount * history.leverage
                     )}
                   </span>
-                  <span className="flex-1 text-center">{props.ethPrice}</span>
                   {history.type === "long" ? (
                     <span
                       className={`${
@@ -123,12 +131,12 @@ function History(props) {
           <span className="flex-1 text-center">Type</span>
           <span className="flex-1 text-center">Entry Price</span>
           <span className="flex-1 text-center">End Price</span>
-          <span className="flex-1 text-center">Size</span>
           <span className="flex-1 text-center">Leverage</span>
+          <span className="flex-1 text-center">Size</span>
           <span className="flex-1 text-center">Entry Position($)</span>
           <span className="flex-1 text-center">End Position($)</span>
           <span className="flex-1 text-center">Execution Fee</span>
-          <span className="flex-1 text-center">Profit</span>
+          <span className="flex-1 text-center">Profit/Loss</span>
           <span className="flex-1 text-center">Collateral</span>
           <span className="flex-1 text-center">Liq.Price</span>
           <span className="flex-1 text-center">Start Date</span>
@@ -158,9 +166,11 @@ function History(props) {
                     {history.entryPrice}
                   </span>
                   <span className="flex-1 text-center">{history.endPrice}</span>
-                  <span className="flex-1 text-center">{history.amount}</span>
                   <span className="flex-1 text-center">
                     {history.leverage}x
+                  </span>
+                  <span className="flex-1 text-center">
+                    {history.amount * history.leverage}
                   </span>
                   <span className="flex-1 text-center">
                     {organizeNumber(
@@ -207,12 +217,12 @@ function History(props) {
           <span className="flex-1 text-center">Type</span>
           <span className="flex-1 text-center">Entry Price</span>
           <span className="flex-1 text-center">End Price</span>
-          <span className="flex-1 text-center">Size</span>
           <span className="flex-1 text-center">Leverage</span>
+          <span className="flex-1 text-center">Size</span>
           <span className="flex-1 text-center">Entry Position($)</span>
           <span className="flex-1 text-center">End Position($)</span>
           <span className="flex-1 text-center">Execution Fee</span>
-          <span className="flex-1 text-center">Profit</span>
+          <span className="flex-1 text-center">Profit/Loss</span>
           <span className="flex-1 text-center">Collateral</span>
           <span className="flex-1 text-center">Liq.Price</span>
           <span className="flex-1 text-center">Start Date</span>
@@ -242,9 +252,11 @@ function History(props) {
                     {history.entryPrice}
                   </span>
                   <span className="flex-1 text-center">{history.endPrice}</span>
-                  <span className="flex-1 text-center">{history.amount}</span>
                   <span className="flex-1 text-center">
                     {history.leverage}x
+                  </span>
+                  <span className="flex-1 text-center">
+                    {history.amount * history.leverage}
                   </span>
                   <span className="flex-1 text-center">
                     {organizeNumber(
