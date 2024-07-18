@@ -8,6 +8,7 @@ const initialState = {
   tradeHistory: [],
   balance: 0,
   walletAddress: undefined,
+  userBalance: 1000000,
 };
 
 export const getTradeHistory = createAsyncThunk(
@@ -48,7 +49,6 @@ export const connectWallet = createAsyncThunk(
       });
       if (accounts.length > 0) {
         account = accounts[0];
-        console.log(accounts);
       } else {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
@@ -56,7 +56,11 @@ export const connectWallet = createAsyncThunk(
         account = accounts[0];
       }
     }
-    return account;
+
+    const response = await axios.post(`${SERVER_URL}/createOrGetUser`, {
+      walletAddress: account,
+    });
+    return response.data.data;
   }
 );
 
@@ -73,16 +77,18 @@ export const historySlice = createSlice({
       state.status = "succeeded";
       state.tradeHistory = action.payload.trades;
       state.balance = action.payload.balance;
-      console.log(state.balance);
+      state.userBalance = action.payload.userBalance;
     });
     builder.addCase(postTrade.fulfilled, (state, action) => {
       state.status = "succeeded";
       state.tradeHistory.push(action.payload.trade);
       state.balance = action.payload.balance;
+      state.userBalance = action.payload.userBalance;
     });
     builder.addCase(quitTrade.fulfilled, (state, action) => {
       state.status = "succeeded";
       state.balance = action.payload.balance;
+      state.userBalance = action.payload.userBalance;
       state.tradeHistory.forEach((trade, index) => {
         if (trade._id === action.payload.trade._id) {
           state.tradeHistory[index] = action.payload.trade;
@@ -91,7 +97,8 @@ export const historySlice = createSlice({
     });
     builder.addCase(connectWallet.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.walletAddress = action.payload;
+      state.walletAddress = action.payload[0].walletAddress;
+      state.userBalance = action.payload[0].balance;
     });
   },
 });
