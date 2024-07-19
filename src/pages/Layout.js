@@ -96,10 +96,10 @@ function Layout() {
                 selectedNav === "leaderboard" ? "bg-[#192531]" : ""
               }`}
             >
-              Leader Board
+              Leaderboard
             </button>
           </Link>
-          <Link to="/pool" onClick={() => handleNav("pool")}>
+          {/* <Link to="/pool" onClick={() => handleNav("pool")}>
             <button
               className={`h-[60px] px-[15px] hover:bg-[#192531] transition-all duration-200 ${
                 selectedNav === "pool" ? "bg-[#192531]" : ""
@@ -107,14 +107,14 @@ function Layout() {
             >
               Pool History
             </button>
-          </Link>
+          </Link> */}
           <Link to="/rule" onClick={() => handleNav("rule")}>
             <button
               className={`h-[60px] px-[15px] hover:bg-[#192531] transition-all duration-200 ${
                 selectedNav === "rule" ? "bg-[#192531]" : ""
               }`}
             >
-              Rule
+              Rules
             </button>
           </Link>
         </div>
