@@ -97,8 +97,8 @@ export const historySlice = createSlice({
     });
     builder.addCase(connectWallet.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.walletAddress = action.payload[0].walletAddress;
-      state.userBalance = action.payload[0].balance;
+      state.walletAddress = action.payload.walletAddress;
+      state.userBalance = action.payload.balance;
     });
   },
 });
