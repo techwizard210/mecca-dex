@@ -55,12 +55,11 @@ export const connectWallet = createAsyncThunk(
         });
         account = accounts[0];
       }
+      const response = await axios.post(`${SERVER_URL}/createOrGetUser`, {
+        walletAddress: account,
+      });
+      return response.data.data;
     }
-
-    const response = await axios.post(`${SERVER_URL}/createOrGetUser`, {
-      walletAddress: account,
-    });
-    return response.data.data;
   }
 );
 
