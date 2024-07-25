@@ -26,21 +26,25 @@ function LeaderBoard() {
               <span className="flex-1 text-center">Trader</span>
               <span className="flex-1 text-center">Profit</span>
             </div>
-            {topTraders.map((trader, index) => {
-              return (
-                <div
-                  className="flex justify-between border-b border-[#242424] py-3"
-                  key={index}
-                >
-                  <span className="flex-1 text-center">
-                    {shortenAddress(trader.walletAddress)}
-                  </span>
-                  <span className="flex-1 text-center">
-                    $ {organizeNumber(trader.profit)}
-                  </span>
-                </div>
-              );
-            })}
+            {topTraders.length == 0 ? (
+              <div className="text-center p-5">There is no traders yet</div>
+            ) : (
+              topTraders.map((trader, index) => {
+                return (
+                  <div
+                    className="flex justify-between border-b border-[#242424] py-3"
+                    key={index}
+                  >
+                    <span className="flex-1 text-center">
+                      {shortenAddress(trader.walletAddress)}
+                    </span>
+                    <span className="flex-1 text-center">
+                      $ {organizeNumber(trader.profit)}
+                    </span>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </div>
